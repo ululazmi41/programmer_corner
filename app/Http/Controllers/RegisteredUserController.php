@@ -18,16 +18,14 @@ class RegisteredUserController extends Controller
     {
         $userAttributes = $request->validate([
             'name'      => ['required'],
-            'handle'    => ['required'],
+            'handle'    => ['required', 'unique:users,handle'],
             'email'     => ['required', 'email', 'unique:users,email'],
             'password'  => ['required', 'confirmed', Password::min(6)],
         ]);
 
-        return response()->json("{hello: world}");
+        $user = User::create($userAttributes);
+        Auth::login($user);
 
-        // $user = User::create($userAttributes);
-        // Auth::login($user);
-
-        // return redirect('/');
+        return redirect('/');
     }
 }

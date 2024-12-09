@@ -15,15 +15,34 @@ class SessionController extends Controller
 
     public function store(Request $request)
     {
-        $attributes = $request->validate([
-            'email' => ['required', 'email'],
+        $usernameEmail = $request->input('email');
+        $isEmail = filter_var($usernameEmail, FILTER_VALIDATE_EMAIL);
+        $validationException = ValidationException::withMessages([
+            'login' => 'Sorry, those credentials do not match.',
+        ]);
+        
+        $request->validate([
+            'email' => ['required'],
             'password' => ['required'],
         ]);
 
-        if (! Auth::attempt($attributes)) {
-            throw ValidationException::withMessages([
-                'email' => 'Sorry, those credentials do not match.',
-            ]);
+        if ($isEmail) {
+            $credentials = [
+                'email' => $request->input('email'),
+                'password' => $request->input('password'),
+            ];
+        } else {
+            if (strpos($isEmail, '@') !== false) {
+                throw $validationException;
+            }
+            $credentials = [
+                'handle' => $request->input('email'),
+                'password' => $request->input('password'),
+            ];
+        }
+
+        if (! Auth::attempt($credentials)) {
+            throw $validationException;
         }
 
         $request->session()->regenerate();
@@ -31,7 +50,7 @@ class SessionController extends Controller
         return redirect('/');
     }
 
-    public function destroy(string $id)
+    public function destroy()
     {
         Auth::logout();
 

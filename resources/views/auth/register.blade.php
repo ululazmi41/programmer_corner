@@ -1,12 +1,6 @@
 @php
     $classValid = "text-gray-700 shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline";
     $classInvalid = "border border-red-500 text-red-500 placeholder-red-500 shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline";
-
-    function classOf(bool $validity) {
-        return ($validity ? "border border-red-500 text-red-500 placeholder-red-500"
-        : "text-gray-700")
-        . " shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline";
-        }
 @endphp
 
 <!DOCTYPE html>
@@ -16,7 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>PCorner</title>
+    <title>Register | PCorner</title>
     @vite(['resources/js/app.js'])
 </head>
 
@@ -29,7 +23,7 @@
                 <p class="text-center text-gray-700 text-lg font-bold">Register</p>
                 <div class="mt-8"></div>
                 <div class="grid gap-4">
-                    <input class="{{ classOf(false) }}" name="name" id="name" type="text" placeholder="Name" />
+                    <input class="{{ $classValid }}" name="name" id="name" type="text" placeholder="Name" />
                     <div>
                         <div class="flex items-center border @error("handle") ? border-red-500 @else border-gray-300 @enderror rounded-md">
                             <span class="pl-3 text-gray-400">@</span>
