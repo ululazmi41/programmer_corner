@@ -1,20 +1,18 @@
-@props(['class' => ''])
-
-<div class="{{ $class }} w-1/5 p-8">
+<div class="hidden md:block md:w-1/6 sticky h-full top-20">
     <ul class="flex flex-col">
-        <li><a href="/" class="flex gap-2 text-md py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
+        <li><a href="/" class="flex gap-2 text-sm py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
             <x-heroicon-o-home class="w-6 h-6 inline" />
             Home
         </a></li>
-        <li><a href="/chat" class="flex gap-2 text-md py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
+        <li><a href="/chat" class="flex gap-2 text-sm py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
             <x-heroicon-o-chat-bubble-left-ellipsis class="w-6 h-6 inline" />
             Chat
         </a></li>
-        <li><a href="/notifications" class="flex gap-2 text-md py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
+        <li><a href="/notifications" class="flex gap-2 text-sm py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
             <x-heroicon-o-bell class="w-6 h-6 inline" />
             Notifications
         </a></li>
-        <li><a href="/corners" class="flex gap-2 text-md py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
+        <li><a href="/corners" class="flex gap-2 text-sm py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
             <x-heroicon-o-rectangle-group class="w-6 h-6 inline" />
             Corners
         </a></li>
