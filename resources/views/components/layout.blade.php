@@ -9,7 +9,7 @@
 </head>
 <body>
     <x-navbar />
-    <div class="px-4 sm:px-8 pb-4 pt-16">
+    <div>
         {{ $slot }}
     </div>
 </body>

@@ -15,11 +15,10 @@
 
             <p class="text-blue-500 text-xl font-bold cursor-default select-none">Pi</p>
         </div>
-        <form class="hidden sm:block w-2/6" action="/search" method="POST">
-            @csrf
+        <form class="hidden sm:block w-2/6" action="search" method="GET">
             <input
                 class="w-full text-gray-700 shadow appearance-none border rounded py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-                name="search" id="search" type="text" placeholder="Search" />
+                name="query" id="query" type="text" placeholder="Search" />
         </form>
         @auth
             <div class="flex gap-2">
@@ -27,18 +26,21 @@
                     <x-heroicon-o-magnifying-glass
                         class="block sm:hidden w-6 h-6 text-gray-400 cursor-pointer hover:text-gray-500" />
                 </a>
-                <x-heroicon-o-bell class="w-6 h-6 text-gray-400 cursor-pointer hover:text-gray-500" />
+                <a href="/users/user">
+                    <x-heroicon-o-bell class="w-6 h-6 text-gray-400 cursor-pointer hover:text-gray-500" />
+                </a>
+                <x-heroicon-o-user-circle class="w-6 h-6 text-gray-400 cursor-pointer" />
                 <div class="relative inline-block text-left">
                     <input type="checkbox" id="authDropdownToggle" class="hidden peer" />
                     <label for="authDropdownToggle">
-                        <x-heroicon-o-user-circle class="w-6 h-6 text-gray-400 cursor-pointer" />
+                        <x-heroicon-o-ellipsis-horizontal class="w-6 h-6 text-gray-400 cursor-pointer" />
                     </label>
 
                     <div id="authDropdownMenu"
                         class="hidden peer-checked:block absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
                         role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                         <div class="py-2 px-1 grid gap-1" role="none">
-                            <a href="#" class="flex gap-2 items-center px-4 py-2 text-md text-gray-700"
+                            <a href="/users/{{ Auth::user()->handle }}" class="flex gap-2 items-center px-4 py-2 text-md text-gray-700"
                                 role="menuitem" tabindex="-1" id="menu-item-0">
                                 <x-heroicon-c-user-circle class="w-4 h-4" />
                                 Profile
