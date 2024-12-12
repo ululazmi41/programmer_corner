@@ -1,23 +1,30 @@
 <div class="hover:bg-gray-100 px-4 pt-4">
-    <div class="grid grid-cols-[max-content_1fr] gap-2">
-        <a href="/communities">
-            <Image class="my-auto w-8 h-8 sm:w-10 sm:h-w-10" src="/img/{{ $imageUrl }}" alt="{{ $imageUrl }}" />
+    @if ($status ?? false)
+        @if ($status == \App\Enums\UserOverview::POST)
+            {{-- Do nothing --}}
+        @elseif ($status === \App\Enums\UserOverview::COMMENT)
+            <h1 class="text-xs text-gray-400 leading-tight">Commented on this post</h1>
+        @endif
+    @endif
+    <div class="grid grid-cols-[max-content_1fr] gap-2 mt-1">
+        <a href="/communities" class="m-auto">
+            <Image class="my-auto w-8 h-8 sm:w-10 sm:h-10" src="/img/{{ $imageUrl }}" alt="{{ $imageUrl }}" />
         </a>
-        <div>
+        <div class="self-center">
             @if ($featured ?? false)
                 <div class="flex items-center gap-1">
                     <x-heroicon-s-tag class="w-2 h-2 text-gray-900" />
                     <p class="text-xs leading-tight text-gray-900">featured</p>
                 </div>
             @endif
-            <div class="text-xs sm:text-md font-bold leading-tight line-clamp-2">What's the cheapest way to host a python script?</div>
+            <div class="text-xs sm:text-md font-bold leading-tight line-clamp-2">{!! $title !!}</div>
             <div class="text-xs text-gray-400">{{ $author }} • {{ $date }}</div>
         </div>
         <div class="hidden sm:block"></div>
         <div class="col-span-2 sm:col-span-1">
             <a href="/">
                 <p class="leading-tight text-xs md:text-sm line-clamp-3">
-                    {{ $description }}
+                    {!! $description !!}
                 </p>
             </a>
             <div class="flex justify-between mt-2">

@@ -1,4 +1,4 @@
-<div class="hidden md:block md:w-1/6 sticky h-full top-20 px-8">
+<div class="hidden md:block sticky h-full top-10 px-8">
     <ul class="flex flex-col">
         <li><a href="/" class="flex gap-2 text-sm py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
             <x-heroicon-o-home class="w-6 h-6 inline" />

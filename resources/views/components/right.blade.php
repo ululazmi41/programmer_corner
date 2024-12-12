@@ -1,4 +1,4 @@
-<div class="w-[300px] hidden md:block h-full sticky top-20 px-8">
+<div class="min-w-64 hidden lg:block h-full sticky top-20">
     <p class="mb-2 text-lg font-bold text-gray-500">Trending Posts</p>
     <div class="flex flex-col gap-2">
         <x-trending-card

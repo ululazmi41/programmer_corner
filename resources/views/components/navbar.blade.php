@@ -5,7 +5,7 @@
                 <x-heroicon-o-bars-3 id="menuDropdownToggle" class="w-6 h-6 text-gray-400 cursor-pointer hover:text-gray-500" />
 
                 <div id="menuDropdownMenu"
-                    class="hidden absolute left-0 z-10 mt-2 w-screen h-screen origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
+                    class="hidden absolute left-0 z-10 mt-2 w-screen h-screen origin-top-left rounded-md shadow-lg ring-1 ring-black/5 focus:outline-none"
                     role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                     <div class="py-2 px-1 grid gap-1" role="none">
                         <x-left-mobile />
@@ -26,10 +26,12 @@
                     <x-heroicon-o-magnifying-glass
                         class="block sm:hidden w-6 h-6 text-gray-400 cursor-pointer hover:text-gray-500" />
                 </a>
-                <a href="/users/user">
+                <a href="/notifications">
                     <x-heroicon-o-bell class="w-6 h-6 text-gray-400 cursor-pointer hover:text-gray-500" />
                 </a>
-                <x-heroicon-o-user-circle class="w-6 h-6 text-gray-400 cursor-pointer" />
+                <a href="{{ route('user.index', ['handle' => Auth::user()->handle]) }}">
+                    <x-heroicon-o-user-circle class="w-6 h-6 text-gray-400" />
+                </a>
                 <div class="relative inline-block text-left">
                     <input type="checkbox" id="authDropdownToggle" class="hidden peer" />
                     <label for="authDropdownToggle">
@@ -40,12 +42,17 @@
                         class="hidden peer-checked:block absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
                         role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                         <div class="py-2 px-1 grid gap-1" role="none">
-                            <a href="/users/{{ Auth::user()->handle }}" class="flex gap-2 items-center px-4 py-2 text-md text-gray-700"
+                            <a href="/users/{{ Auth::user()->handle }}" class="flex gap-2 items-center px-4 py-2 text-sm text-gray-700"
                                 role="menuitem" tabindex="-1" id="menu-item-0">
                                 <x-heroicon-c-user-circle class="w-4 h-4" />
                                 Profile
                             </a>
-                            <a href="/logout" class="flex gap-2 items-center px-4 py-2 text-md text-gray-700"
+                            <a href="/settings" class="flex gap-2 items-center px-4 py-2 text-sm text-gray-700"
+                                role="menuitem" tabindex="-1" id="menu-item-1">
+                                <x-heroicon-o-cog-6-tooth class="w-4 h-4" />
+                                Settings
+                            </a>
+                            <a href="/logout" class="flex gap-2 items-center px-4 py-2 text-sm text-gray-700"
                                 role="menuitem" tabindex="-1" id="menu-item-1">
                                 <Image class="w-4 h-4 inline" src="/img/register.png" alt="register icon" />
                                 Logout

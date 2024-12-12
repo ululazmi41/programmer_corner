@@ -1,7 +1,7 @@
 <x-layout>
-    <div class="flex md:gap-8 min-h-screen">
+    <div class="flex md:gap-8 pt-8 md:pt-16">
         <x-left />
-        <div class="md:w-3/5">
+        <div class="lg:w-3/5 sm:pr-2 lg:pr-0">
             <div class="flex flex-col">
                 <x-card
                 author="Python"

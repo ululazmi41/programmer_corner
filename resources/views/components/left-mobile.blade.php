@@ -1,4 +1,4 @@
-<div class="p-2 sm:p-4">
+<div class="p-2 sm:p-4 max-w-48 bg-white">
     <ul class="flex flex-col">
         <li><a href="/" class="w-max flex gap-2 text-sm sm:text-md py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
             <x-heroicon-o-home class="w-6 h-6 sm:w-6 sm:h-6 inline" />
