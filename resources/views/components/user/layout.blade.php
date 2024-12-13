@@ -20,7 +20,7 @@
             <p>Learner.</p>
             <p class="text-sm text-gray-400">Joined 5 December 2024</p>
             <div class="flex gap-4 mt-2">
-                <a href="/users/{{ $user->handle }}">
+                <a href="/users/{{ $user->username }}">
                     <div class="flex flex-col">
                         <p class="{{ getSubPage() == '' ? 'font-semibold' : 'text-gray-500 hover:text-gray-700' }}">Overview</p>
                         @if(getSubPage() == '')
@@ -28,7 +28,7 @@
                         @endif
                     </div>
                 </a>
-                <a href="/users/{{ $user->handle }}/posts">
+                <a href="/users/{{ $user->username }}/posts">
                     <div class="flex flex-col">
                         <p class="{{ getSubPage() == 'posts' ? 'font-semibold' : 'text-gray-500 hover:text-gray-700' }}">Posts</p>
                         @if(getSubPage() == 'posts')
@@ -36,7 +36,7 @@
                         @endif
                     </div>
                 </a>
-                <a href="/users/{{ $user->handle }}/comments">
+                <a href="/users/{{ $user->username }}/comments">
                     <div class="flex flex-col">
                         <p class="{{ getSubPage() == 'comments' ? 'font-semibold' : 'text-gray-500 hover:text-gray-700' }}">Comments</p>
                         @if(getSubPage() == 'comments')

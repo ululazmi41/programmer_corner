@@ -25,9 +25,9 @@
                 <div class="grid gap-4">
                     <input class="{{ $classValid }}" name="name" id="name" type="text" placeholder="Name" />
                     <div>
-                        <div class="flex items-center border @error("handle") ? border-red-500 @else border-gray-300 @enderror rounded-md">
+                        <div class="flex items-center border @error("username") ? border-red-500 @else border-gray-300 @enderror rounded-md">
                             <span class="pl-3 text-gray-400">@</span>
-                            <input class="flex-1 p-2 border-none focus:outline-none" name="handle" id="handle" type="text" placeholder="Handle" value="{{ old("handle") }}" />
+                            <input class="flex-1 p-2 border-none focus:outline-none" name="username" id="username" type="text" placeholder="Username" value="{{ old("username") }}" />
                         </div>
                     </div>
                     <div>

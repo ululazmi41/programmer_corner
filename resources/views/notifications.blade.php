@@ -16,7 +16,7 @@
                         <div>
                             <div class="flex gap-2">
                                 @foreach ($notification['users'] as $user)
-                                <a href="/users/{{ $user['handle'] }}" class="inline-block text-blue-500 hover:underline">
+                                <a href="/users/{{ $user['username'] }}" class="inline-block text-blue-500 hover:underline">
                                     <img class="my-auto w-6 h-6 sm:w-8 sm:h-8" src="/img/{{ $user['imageUrl'] }}"
                                         alt="{{ $user['imageUrl'] }}">
                                 </a>
@@ -27,8 +27,8 @@
                                     @if (count($notification['users']) > 1 && $index == count($notification['users']) - 1)
                                         &nbsp;and&nbsp;
                                     @endif
-                                    <a href="/users/{{ $user['handle'] }}" class="inline-block text-blue-500 hover:underline">
-                                        {{ $user['handle'] }}
+                                    <a href="/users/{{ $user['username'] }}" class="inline-block text-blue-500 hover:underline">
+                                        {{ $user['username'] }}
                                     </a>
                                     @if ($index < count($notification['users']) - 2)
                                         ,&nbsp;

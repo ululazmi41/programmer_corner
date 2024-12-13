@@ -36,8 +36,8 @@
                     <input class="{{ getClass('email', $errors) }}" name="email" id="email" type="text" placeholder="Username or email" value="{{ old("email") }}" />
                     <input class="{{ getClass('password', $errors) }}" name="password" id="password" type="password" placeholder="Password" />
                     <p class="mb-4">
-                        Already have an account? <a href="/login" class="cursor-pointer text-blue-600 hover:underline hover:decoration-blue-400 hover:text-blue-400 transition transform">
-                            login
+                        Don't have an account? <a href="/register" class="cursor-pointer text-blue-600 hover:underline hover:decoration-blue-400 hover:text-blue-400 transition transform">
+                            register
                         </a>
                     </p>
                 </div>

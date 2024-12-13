@@ -29,7 +29,7 @@
                 <a href="/notifications">
                     <x-heroicon-o-bell class="w-6 h-6 text-gray-400 cursor-pointer hover:text-gray-500" />
                 </a>
-                <a href="{{ route('user.index', ['handle' => Auth::user()->handle]) }}">
+                <a href="{{ route('user.index', ['username' => Auth::user()->username]) }}">
                     <x-heroicon-o-user-circle class="w-6 h-6 text-gray-400" />
                 </a>
                 <div class="relative inline-block text-left">
@@ -42,7 +42,7 @@
                         class="hidden peer-checked:block absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
                         role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                         <div class="py-2 px-1 grid gap-1" role="none">
-                            <a href="/users/{{ Auth::user()->handle }}" class="flex gap-2 items-center px-4 py-2 text-sm text-gray-700"
+                            <a href="/users/{{ Auth::user()->username }}" class="flex gap-2 items-center px-4 py-2 text-sm text-gray-700"
                                 role="menuitem" tabindex="-1" id="menu-item-0">
                                 <x-heroicon-c-user-circle class="w-4 h-4" />
                                 Profile

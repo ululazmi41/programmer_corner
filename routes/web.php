@@ -6,16 +6,63 @@ use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 Route::get('/', function () {
     return view('home');
 });
 
 Route::get('/settings', function () {
-    dd("Hello!");
+    $user = Auth::user();
 
-    return view('settings');
+    return view('settings', compact('user'));
+})->middleware('auth');
+
+Route::post('/settings', function (Request $request) {
+    if ($request->type == "password") {
+        $rule =  ['required', 'confirmed', Password::min(6)];
+    } else if ($request->type == "email") {
+        $rule =  ['required', 'email', 'unique:users,email'];
+    } else if ($request->type == "username") {
+        $rule =  ['required', 'unique:users,username'];
+    } else {
+        $rule =  ['required'];
+    }
+
+    $validation = Validator::make($request->all(), [
+        'value' => $rule,
+    ]);
+
+    if (!$validation->fails()) {
+        $user = User::where("id", $request->id)->first();
+        if ($request->type == "password") {
+            $user->password = bcrypt($request->value);
+        } else if ($request->type == "email") {
+            $user->email = $request->value;
+        } else if ($request->type == "username") {
+            $user->username = $request->value;
+        } else if ($request->type == "name") {
+            $user->name = $request->value;
+        } else {
+            return response()->json([
+                "type" => $request->type,
+                "error" => "Unknown request type: {$request['value']}",
+            ], 422);
+        }
+        $user->save();
+
+        return response()->json([
+            "type" => $request->type,
+        ], 200);
+    } else {
+        return response()->json([
+            "type" => $request->type,
+        ], 422);
+    }
+
 })->middleware('auth');
 
 Route::get('/notifications', function () {
@@ -24,15 +71,15 @@ Route::get('/notifications', function () {
             "type" => NotificationType::LIKE,
             "users" => [
                 [
-                    "handle" => "person1",
+                    "username" => "person1",
                     "imageUrl" => "rust.png",
                 ],
                 [
-                    "handle" => "person2",
+                    "username" => "person2",
                     "imageUrl" => "python.png",
                 ],
                 [
-                    "handle" => "person3",
+                    "username" => "person3",
                     "imageUrl" => "kotlin.png",
                 ],
             ],
@@ -52,7 +99,7 @@ Route::get('/notifications', function () {
             "type" => NotificationType::COMMENT,
             "users" => [
                 [
-                    "handle" => "person3",
+                    "username" => "person3",
                     "imageUrl" => "kotlin.png",
                 ],
             ],
@@ -72,11 +119,11 @@ Route::get('/notifications', function () {
             "type" => NotificationType::LIKE,
             "users" => [
                 [
-                    "handle" => "person1",
+                    "username" => "person1",
                     "imageUrl" => "rust.png",
                 ],
                 [
-                    "handle" => "person3",
+                    "username" => "person3",
                     "imageUrl" => "kotlin.png",
                 ],
             ],
@@ -98,8 +145,8 @@ Route::get('/notifications', function () {
 })->middleware('auth');
 
 Route::prefix('users')->group(function () {
-    Route::get('/{handle}', function (string $handle) {
-        $user = User::where('handle', $handle)->first();
+    Route::get('/{username}', function (string $username) {
+        $user = User::where('username', $username)->first();
         
         $posts = [
             [
@@ -149,8 +196,8 @@ Route::prefix('users')->group(function () {
         return view('users.index', compact('user', 'posts'));
     })->name('user.index');
 
-    Route::get('/{handle}/posts', function (string $handle) {
-        $user = User::where('handle', $handle)->first();
+    Route::get('/{username}/posts', function (string $username) {
+        $user = User::where('username', $username)->first();
         
         $posts = [
             [
@@ -184,8 +231,8 @@ Route::prefix('users')->group(function () {
         return view('users.posts', compact('user', 'posts'));
     })->name('user.posts');
 
-    Route::get('/{handle}/comments', function (string $handle) {
-        $user = User::where('handle', $handle)->first();
+    Route::get('/{username}/comments', function (string $username) {
+        $user = User::where('username', $username)->first();
         
         $posts = [
             [
@@ -264,7 +311,7 @@ Route::controller(RegisteredUserController::class)->group(function () {
 });
 
 Route::controller(SessionController::class)->group(function () {
-    Route::get('/login', 'create')->middleware('guest');
+    Route::get('/login', 'create')->middleware('guest')->name('login');
     Route::post('/login', 'store')->middleware('guest');
     Route::GET('/logout', 'destroy')->middleware('auth');
 });

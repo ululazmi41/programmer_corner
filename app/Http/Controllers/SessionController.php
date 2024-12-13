@@ -20,7 +20,7 @@ class SessionController extends Controller
         $validationException = ValidationException::withMessages([
             'login' => 'Sorry, those credentials do not match.',
         ]);
-        
+
         $request->validate([
             'email' => ['required'],
             'password' => ['required'],
@@ -36,7 +36,7 @@ class SessionController extends Controller
                 throw $validationException;
             }
             $credentials = [
-                'handle' => $request->input('email'),
+                'username' => $request->input('email'),
                 'password' => $request->input('password'),
             ];
         }
