@@ -13,7 +13,7 @@
             :status="$post['status']"
             author="{{ $post['author'] }}"
             date="{{ $post['date'] }}"
-            imageUrl="{{ $post['imageUrl'] }}"
+            imageUrl="{{ $post['image_url'] }}"
             title="{{ $post['title'] }}"
             description="{{ $post['description'] }}"
             likes="{{ $post['likes'] }}"

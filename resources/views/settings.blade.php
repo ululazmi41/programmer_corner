@@ -19,46 +19,59 @@
 
 <x-layout>
     <form id="editDialog" class="hidden w-screen h-screen absolute z-20 bg-black/10">
-        <div class="m-auto w-2/6 h-max bg-white border-gray-500 rounded-md space-y-3 p-4">
-            <h2 class="text-lg font-bold">Edit Something</h2>
+        <div class="m-auto w-5/6 lg:w-2/6 h-max bg-white border-gray-500 rounded-md space-y-3 p-4">
+            <div class="flex justify-between">
+                <h2 id="title" class="text-sm lg:text-lg font-bold">Edit Something</h2>
+                <x-heroicon-o-x-mark class="w-6 h-6 text-gray-500 cursor-pointer" onclick="closeEdit()" />
+            </div>
             <input type="hidden" id="type">
             <input type="hidden" id="old" disabled />
-            <input class="{{ getClass('input', $errors) }}" name="input" id="input" type="text" placeholder="new something" />
-            <input class="hidden {{ getClass('confirmation', $errors) }}" name="value_confirmation" id="confirmation" type="text" placeholder="new something" />
+            <input class="{{ getClass('input', $errors) }} text-xs" name="input" id="input" type="text" placeholder="new something" />
+            <input class="hidden {{ getClass('confirmation', $errors) }} text-xs" name="value_confirmation" id="confirmation" type="text" placeholder="new something" />
             <div class="flex pt-4">
-                <button class="bg-blue-500 rounded-lg py-1 px-4 text-white ml-auto" type="submit">Save</button>
+                <button class="text-sm lg:text-base bg-blue-500 rounded-lg py-1 px-3 lg:px-4 text-white ml-auto" type="submit">Save</button>
             </div>
         </div>
     </form>
-    <div class="flex justify-between md:gap-8 pt-8 md:pt-16">
+    <div class="flex justify-between md:gap-8 pt-12 md:pt-16">
         <x-left />
         <div class="w-full">
-            <div class="mx-auto w-4/6">
-                <h1 class="text-2xl text-gray-700 font-bold">Settings</h1>
+            <div class="mx-auto w-5/6 lg:w-4/6">
+                <h1 class="text-md lg:text-2xl text-gray-700 font-bold">Settings</h1>
+                <div class="flex mt-4 items-center justify-between lg:justify-start lg:gap-2">
+                    <image id="icon" class="w-12 h-12" src="{{ $user["image_url"] ? asset('storage/icons/' . $user["image_url"]) : "/img/user.png" }}" alt="profile picture" />
+                    <div class="flex items-center gap-1">
+                        <div id="deleteIcon" class="{{ $user["image_url"] === null ? "hidden" : "" }}">
+                            <x-heroicon-s-trash onclick="deleteFile()" class="w-5 h-5 lg:w-6 lg:h-6 text-red-400 hover:text-red-500 cursor-pointer" />
+                        </div>
+                        <input type="file" name="file" id="file" class="w-0 h-0 opacity-0" accept="image/*" onchange="handleFile(event)">
+                        <button onclick="inputFile()" class="border border-blue-500 hover:bg-blue-500 rounded-lg px-2 lg:px-3 lg:py-1 text-sm text-blue-500 hover:text-white">Add</button>
+                    </div>
+                </div>
                 <div class="flex flex-col gap-4 mt-4">
                     <div class="flex justify-between">
-                        <p class="text-md text-gray-500">Name</p>
+                        <p class="text-xs lg:text-base text-gray-500 leading-3">Name</p>
                         <div class="flex gap-2 cursor-pointer" onclick="edit('name')">
-                            <p id="name" class="leading-3">{{ $user['name'] }}</p>
+                            <p id="name" class="text-xs lg:text-base leading-3">{{ $user['name'] }}</p>
                             <x-heroicon-o-chevron-right class="w-4 h-4" />
                         </div>
                     </div>
                     <div class="flex justify-between">
-                        <p class="text-md text-gray-500">Username</p>
+                        <p class="text-xs lg:text-base text-gray-500 leading-3">Username</p>
                         <div class="flex gap-2 cursor-pointer" onclick="edit('username')">
-                            <p id="username" class="leading-3">{{ $user['username'] }}</p>
+                            <p id="username" class="text-xs lg:text-base leading-3">{{ $user['username'] }}</p>
                             <x-heroicon-o-chevron-right class="w-4 h-4" />
                         </div>
                     </div>
                     <div class="flex justify-between">
-                        <p class="text-md text-gray-500">Email</p>
+                        <p class="text-xs lg:text-base text-gray-500 leading-3">Email</p>
                         <div class="flex gap-2 cursor-pointer" onclick="edit('email')">
-                            <p id="email" class="leading-3">{{ $user['email'] }}</p>
+                            <p id="email" class="text-xs lg:text-base leading-3">{{ $user['email'] }}</p>
                             <x-heroicon-o-chevron-right class="w-4 h-4" />
                         </div>
                     </div>
                     <div class="flex justify-between">
-                        <p class="text-md text-gray-500">Password</p>
+                        <p class="text-xs lg:text-base text-gray-500 leading-3">Password</p>
                         <x-heroicon-o-chevron-right class="w-4 h-4 cursor-pointer" onclick="edit('password')" />
                     </div>
                 </div>
@@ -68,6 +81,75 @@
     </div>
 
     <script>
+        function inputFile() {
+            const file = document.querySelector('#file');
+            file.click();
+        }
+
+        function deleteFile() {
+            const avatar = document.querySelector("#icon");
+            avatar.src = "/img/user.png";
+        
+            fetch("/settings/icon", {
+                method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Icon removed");
+                console.log(data);
+            })
+            .catch(error => {
+                console.log("Error removing icon");
+            });
+
+            const deleteIcon = document.querySelector("#deleteIcon");
+            if (!deleteIcon.classList.contains("hidden")) {
+                deleteIcon.classList.add("hidden");
+            }
+        }
+
+        function handleFile() {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const url = e.target.result;
+                    const avatar = document.querySelector("#icon");
+                    avatar.src = url;
+                }
+                reader.readAsDataURL(file);
+
+                const deleteIcon = document.querySelector("#deleteIcon");
+                if (deleteIcon.classList.contains("hidden")) {
+                    deleteIcon.classList.remove("hidden");
+                }
+            
+                let formData = new FormData();
+                formData.append("icon", file);
+                
+                fetch("/settings/icon", {
+                    method: "POST",
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Icon uploaded");
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.log("Error uploading icon");
+                });
+            }
+        }
+
         function title(text) {
             return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
         }
@@ -78,11 +160,13 @@
             
             const old = document.querySelector('#old');
             const type = document.querySelector('#type');
+            const titleElement = document.querySelector('#title');
             const input = document.querySelector('#input');
             const confirmation = document.querySelector('#confirmation');
             
             type.value = id;
 
+            titleElement.innerText = `Edit ${title(id)}`;
             input.placeholder = `New ${title(id)}`;
             confirmation.placeholder = `New ${title(id)}`;
 

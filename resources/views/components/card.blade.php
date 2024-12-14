@@ -66,9 +66,9 @@
     <div class="mt-2 bg-gray-300 h-px w-full"></div>
 
     <script>
-        function toggleLike(imageUrl) {
-            const likeButton = document.getElementById(`like#${imageUrl}`);
-            const dislikeButton = document.getElementById(`dislike#${imageUrl}`);
+        function toggleLike(image_url) {
+            const likeButton = document.getElementById(`like#${image_url}`);
+            const dislikeButton = document.getElementById(`dislike#${image_url}`);
 
             dislikeButton.classList.toggle("hidden");
             dislikeButton.classList.toggle("block");
@@ -76,9 +76,9 @@
             likeButton.classList.toggle("block");
         }
 
-        function toggleBookmark(imageUrl) {
-            const bookmarkingButton = document.getElementById(`bookmarking#${imageUrl}`);
-            const bookmarkedButton = document.getElementById(`bookmarked#${imageUrl}`);
+        function toggleBookmark(image_url) {
+            const bookmarkingButton = document.getElementById(`bookmarking#${image_url}`);
+            const bookmarkedButton = document.getElementById(`bookmarked#${image_url}`);
 
             bookmarkedButton.classList.toggle("hidden");
             bookmarkedButton.classList.toggle("block");

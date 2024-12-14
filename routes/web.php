@@ -6,8 +6,10 @@ use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
@@ -15,11 +17,61 @@ Route::get('/', function () {
     return view('home');
 });
 
+Route::get('/create-corner', function () {
+    return view('/corners/create');
+});
+
 Route::get('/settings', function () {
     $user = Auth::user();
 
     return view('settings', compact('user'));
 })->middleware('auth');
+
+Route::delete('/settings/icon', function () {
+    $filepath = 'icons/' . Auth::user()->image_url;
+
+    if (Storage::disk('public')->exists($filepath)) {
+        Storage::disk('public')->delete($filepath);
+
+        $user = User::where('id', Auth::user()->id)->first();
+        $user->image_url = null;
+        $user->save();
+
+        return response()->json([
+            "status" => "ok",
+        ], 200);
+    } else {
+        return response()->json([
+            "status" => "error",
+        ], 500);
+    }
+});
+
+Route::post("/settings/icon", function (Request $request) {
+    $oldpath = 'icons/' . Auth::user()->image_url;
+    
+    if (Storage::disk('public')->exists($oldpath)) {
+        Storage::disk('public')->delete($oldpath);
+
+        $user = User::where('id', Auth::user()->id)->first();
+        $user->image_url = null;
+        $user->save();
+    }
+
+    $filename = Str::uuid() . '.' . $request->file('icon')->getClientOriginalExtension();
+    $filepath = $request->file('icon')->storeAs('icons', $filename, 'public');
+
+    $filepath = 'icons/' . Auth::user()->image_url;
+
+    $user = User::where('id', Auth::user()->id)->first();
+    $user->image_url = $filename;
+    $user->save();
+
+    return response()->json([
+        "filename" => $filename,
+        "filepath" => $filepath,
+    ], 200);
+});
 
 Route::post('/settings', function (Request $request) {
     if ($request->type == "password") {
@@ -72,20 +124,20 @@ Route::get('/notifications', function () {
             "users" => [
                 [
                     "username" => "person1",
-                    "imageUrl" => "rust.png",
+                    "image_url" => "rust.png",
                 ],
                 [
                     "username" => "person2",
-                    "imageUrl" => "python.png",
+                    "image_url" => "python.png",
                 ],
                 [
                     "username" => "person3",
-                    "imageUrl" => "kotlin.png",
+                    "image_url" => "kotlin.png",
                 ],
             ],
             "author" => "Python",
             "date" => "1/12/2024",
-            "imageUrl" => "python.png",
+            "image_url" => "python.png",
             "title" => "What's the cheapest way to host a python script?",
             "description" => "Hello, I have a Python script that I need to run every minute. I came across PythonAnywhere, which costs about $5 per month for the first Tier Account. Are there any cheaper alternatives to keep my script running? Would it be more cost-effective to run the script continuously by leaving my computer on? I’m new to this, so any advice or suggestions would be greatly appreciated. Thank you! ",
             "likes" => "13",
@@ -100,12 +152,12 @@ Route::get('/notifications', function () {
             "users" => [
                 [
                     "username" => "person3",
-                    "imageUrl" => "kotlin.png",
+                    "image_url" => "kotlin.png",
                 ],
             ],
             "author" => "Golang",
             "date" => "3/12/2024",
-            "imageUrl" => "go.png",
+            "image_url" => "go.png",
             "title" => "Advent of Code 2024 Day 1: Missing abs() for integers",
             "description" => "Wrote a blog about this year's advent of code day 1. While solving the problem I was once again struck with the missing function for calculating absolute value for integers and decided to dig a lil deeper. You'll also find a small recap of how the abs() function for floats evolved over time in the standard library. ",
             "likes" => "7",
@@ -120,16 +172,16 @@ Route::get('/notifications', function () {
             "users" => [
                 [
                     "username" => "person1",
-                    "imageUrl" => "rust.png",
+                    "image_url" => "rust.png",
                 ],
                 [
                     "username" => "person3",
-                    "imageUrl" => "kotlin.png",
+                    "image_url" => "kotlin.png",
                 ],
             ],
             "author" => "Rust",
             "date" => "26/11/2024",
-            "imageUrl" => "rust.png",
+            "image_url" => "rust.png",
             "title" => "Anyone actually using io_uring with rust in production? What's the experience like?",
             "description" => "I have a long running program that ingests a lot of data and then pushes them to subscribed listeners. Recently the amount of data for ingesting has increased and I am facing a bottleneck while parsing the data. I am rethinking the architecture and want to try io_uring. So what has been your experience with it in rust? Has there been any downside to using runtimes like glommio or tokio_uring?",
             "likes" => "31",
@@ -153,7 +205,7 @@ Route::prefix('users')->group(function () {
                 "status" => UserOverview::POST,
                 "author" => "Python",
                 "date" => "1/12/2024",
-                "imageUrl" => "python.png",
+                "image_url" => "python.png",
                 "title" => "What's the cheapest way to host a python script?",
                 "description" => "Hello, I have a Python script that I need to run every minute. I came across PythonAnywhere, which costs about $5 per month for the first Tier Account. Are there any cheaper alternatives to keep my script running? Would it be more cost-effective to run the script continuously by leaving my computer on? I’m new to this, so any advice or suggestions would be greatly appreciated. Thank you! ",
                 "likes" => "13",
@@ -167,7 +219,7 @@ Route::prefix('users')->group(function () {
                 "status" => UserOverview::COMMENT,
                 "author" => "Golang",
                 "date" => "3/12/2024",
-                "imageUrl" => "go.png",
+                "image_url" => "go.png",
                 "title" => "Advent of Code 2024 Day 1: Missing abs() for integers",
                 "description" => "Wrote a blog about this year's advent of code day 1. While solving the problem I was once again struck with the missing function for calculating absolute value for integers and decided to dig a lil deeper. You'll also find a small recap of how the abs() function for floats evolved over time in the standard library. ",
                 "likes" => "7",
@@ -181,7 +233,7 @@ Route::prefix('users')->group(function () {
                 "status" => UserOverview::POST,
                 "author" => "Rust",
                 "date" => "26/11/2024",
-                "imageUrl" => "rust.png",
+                "image_url" => "rust.png",
                 "title" => "Anyone actually using io_uring with rust in production? What's the experience like?",
                 "description" => "I have a long running program that ingests a lot of data and then pushes them to subscribed listeners. Recently the amount of data for ingesting has increased and I am facing a bottleneck while parsing the data. I am rethinking the architecture and want to try io_uring. So what has been your experience with it in rust? Has there been any downside to using runtimes like glommio or tokio_uring?",
                 "likes" => "31",
@@ -203,7 +255,7 @@ Route::prefix('users')->group(function () {
             [
                 "author" => "Python",
                 "date" => "1/12/2024",
-                "imageUrl" => "python.png",
+                "image_url" => "python.png",
                 "title" => "What's the cheapest way to host a python script?",
                 "description" => "Hello, I have a Python script that I need to run every minute. I came across PythonAnywhere, which costs about $5 per month for the first Tier Account. Are there any cheaper alternatives to keep my script running? Would it be more cost-effective to run the script continuously by leaving my computer on? I’m new to this, so any advice or suggestions would be greatly appreciated. Thank you! ",
                 "likes" => "13",
@@ -216,7 +268,7 @@ Route::prefix('users')->group(function () {
             [
                 "author" => "Rust",
                 "date" => "26/11/2024",
-                "imageUrl" => "rust.png",
+                "image_url" => "rust.png",
                 "title" => "Anyone actually using io_uring with rust in production? What's the experience like?",
                 "description" => "I have a long running program that ingests a lot of data and then pushes them to subscribed listeners. Recently the amount of data for ingesting has increased and I am facing a bottleneck while parsing the data. I am rethinking the architecture and want to try io_uring. So what has been your experience with it in rust? Has there been any downside to using runtimes like glommio or tokio_uring?",
                 "likes" => "31",
@@ -238,7 +290,7 @@ Route::prefix('users')->group(function () {
             [
                 "author" => "Golang",
                 "date" => "3/12/2024",
-                "imageUrl" => "go.png",
+                "image_url" => "go.png",
                 "title" => "Advent of Code 2024 Day 1: Missing abs() for integers",
                 "description" => "Wrote a blog about this year's advent of code day 1. While solving the problem I was once again struck with the missing function for calculating absolute value for integers and decided to dig a lil deeper. You'll also find a small recap of how the abs() function for floats evolved over time in the standard library. ",
                 "likes" => "7",
@@ -264,7 +316,7 @@ Route::get('/search', function (Request $request) {
             [
                 "author" => "Python",
                 "date" => "1/12/2024",
-                "imageUrl" => "python.png",
+                "image_url" => "python.png",
                 "title" => "What's the cheapest way to host a python script?",
                 "description" => "Hello, I have a Python script that I need to run every minute. I came across PythonAnywhere, which costs about $5 per month for the first Tier Account. Are there any cheaper alternatives to keep my script running? Would it be more cost-effective to run the script continuously by leaving my computer on? I’m new to this, so any advice or suggestions would be greatly appreciated. Thank you! ",
                 "likes" => "13",
@@ -277,7 +329,7 @@ Route::get('/search', function (Request $request) {
             [
                 "author" => "Golang",
                 "date" => "3/12/2024",
-                "imageUrl" => "go.png",
+                "image_url" => "go.png",
                 "title" => "Advent of Code 2024 Day 1: Missing abs() for integers",
                 "description" => "Wrote a blog about this year's advent of code day 1. While solving the problem I was once again struck with the missing function for calculating absolute value for integers and decided to dig a lil deeper. You'll also find a small recap of how the abs() function for floats evolved over time in the standard library. ",
                 "likes" => "7",
@@ -290,7 +342,7 @@ Route::get('/search', function (Request $request) {
             [
                 "author" => "Rust",
                 "date" => "26/11/2024",
-                "imageUrl" => "rust.png",
+                "image_url" => "rust.png",
                 "title" => "Anyone actually using io_uring with rust in production? What's the experience like?",
                 "description" => "I have a long running program that ingests a lot of data and then pushes them to subscribed listeners. Recently the amount of data for ingesting has increased and I am facing a bottleneck while parsing the data. I am rethinking the architecture and want to try io_uring. So what has been your experience with it in rust? Has there been any downside to using runtimes like glommio or tokio_uring?",
                 "likes" => "31",

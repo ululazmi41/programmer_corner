@@ -17,8 +17,8 @@
                             <div class="flex gap-2">
                                 @foreach ($notification['users'] as $user)
                                 <a href="/users/{{ $user['username'] }}" class="inline-block text-blue-500 hover:underline">
-                                    <img class="my-auto w-6 h-6 sm:w-8 sm:h-8" src="/img/{{ $user['imageUrl'] }}"
-                                        alt="{{ $user['imageUrl'] }}">
+                                    <img class="my-auto w-6 h-6 sm:w-8 sm:h-8" src="/img/{{ $user['image_url'] }}"
+                                        alt="{{ $user['image_url'] }}">
                                 </a>
                                 @endforeach
                             </div>
