@@ -26,8 +26,8 @@
             </div>
             <input type="hidden" id="type">
             <input type="hidden" id="old" disabled />
-            <input class="{{ getClass('input', $errors) }} text-xs" name="input" id="input" type="text" placeholder="new something" />
-            <input class="hidden {{ getClass('confirmation', $errors) }} text-xs" name="value_confirmation" id="confirmation" type="text" placeholder="new something" />
+            <input class="{{ getClass('input', $errors) }} text-xs lg:text-md" name="input" id="input" type="text" placeholder="new something" />
+            <input class="hidden {{ getClass('confirmation', $errors) }} text-xs lg:text-md" name="value_confirmation" id="confirmation" type="text" placeholder="new something" />
             <div class="flex pt-4">
                 <button class="text-sm lg:text-base bg-blue-500 rounded-lg py-1 px-3 lg:px-4 text-white ml-auto" type="submit">Save</button>
             </div>
@@ -51,21 +51,21 @@
                 <div class="flex flex-col gap-4 mt-4">
                     <div class="flex justify-between">
                         <p class="text-xs lg:text-base text-gray-500 leading-3">Name</p>
-                        <div class="flex gap-2 cursor-pointer" onclick="edit('name')">
+                        <div class="flex gap-2 cursor-pointer items-center" onclick="edit('name')">
                             <p id="name" class="text-xs lg:text-base leading-3">{{ $user['name'] }}</p>
                             <x-heroicon-o-chevron-right class="w-4 h-4" />
                         </div>
                     </div>
                     <div class="flex justify-between">
                         <p class="text-xs lg:text-base text-gray-500 leading-3">Username</p>
-                        <div class="flex gap-2 cursor-pointer" onclick="edit('username')">
+                        <div class="flex gap-2 cursor-pointer items-center" onclick="edit('username')">
                             <p id="username" class="text-xs lg:text-base leading-3">{{ $user['username'] }}</p>
                             <x-heroicon-o-chevron-right class="w-4 h-4" />
                         </div>
                     </div>
                     <div class="flex justify-between">
                         <p class="text-xs lg:text-base text-gray-500 leading-3">Email</p>
-                        <div class="flex gap-2 cursor-pointer" onclick="edit('email')">
+                        <div class="flex gap-2 cursor-pointer items-center" onclick="edit('email')">
                             <p id="email" class="text-xs lg:text-base leading-3">{{ $user['email'] }}</p>
                             <x-heroicon-o-chevron-right class="w-4 h-4" />
                         </div>
@@ -112,7 +112,7 @@
             }
         }
 
-        function handleFile() {
+        function handleFile(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
