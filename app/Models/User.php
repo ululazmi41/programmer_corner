@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -49,8 +51,18 @@ class User extends Authenticatable
         ];
     }
 
-    public function corners(): HasMany
+    public function posts(): hasMany
     {
-        return $this->hasMany(Corner::class, 'creator_id');
+        return $this->hasMany(Post::class);
+    }
+
+    public function corners(): BelongsToMany
+    {
+        return $this->belongsToMany(Corner::class);
+    }
+
+    public function createdCorners(): HasMany
+    {
+        return $this->hasMany(Corner::class, 'owner_id');
     }
 }

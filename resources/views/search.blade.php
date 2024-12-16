@@ -6,7 +6,7 @@
                 @if(empty($posts))
                     <div class="grid px-4 w-5/6 m-auto md:w-full">
                         <div class="grid m-auto text-center">
-                            <Image class="m-auto auto w-8 h-8 md:w-16 md:h-16" src="/img/python.png" alt="python.png" />
+                            <x-heroicon-o-magnifying-glass class="m-auto auto w-8 h-8 md:w-12 md:h-12" />
                             <h1 class="font-bold text-sm md:text-lg">There's none around here...</h1>
                             <p class="text-xs md:text-md">Hmm... maybe check your spellings or try different word</p>
                         </div>

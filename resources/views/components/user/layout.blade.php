@@ -14,10 +14,10 @@
     <div class="flex md:gap-4 pt-4 md:pt-16">
         <x-left />
         <div class="w-full py-8 px-4 md:p-0">
-            <image id="icon" class="w-16 h-16" src="{{ $user["image_url"] ? asset('storage/icons/' . $user["image_url"]) : "/img/user.png" }}" alt="profile picture" />
+            <image id="icon" class="w-16 h-16 rounded-full" src="{{ $user["image_url"] ? asset('storage/icons/' . $user["image_url"]) : "/img/user.png" }}" alt="profile picture" />
             <p class="font-bold text-xl leading-tight">{{ $user["name"] }}</p>
             <p class="text-gray-400 leading-tight">{{ '@' }}{{ $user["username"] }}</p>
-            <p>TODO: Learner.</p>
+            <p>TODO: User Description.</p>
             <p class="text-sm text-gray-400">Joined {{ $user->created_at->format('j F Y') }}
             </p>
             <div class="flex gap-4 mt-2">

@@ -8,7 +8,7 @@
     @endif
     <div class="grid grid-cols-[max-content_1fr] gap-2 mt-1">
         <a href="/communities" class="m-auto">
-            <Image class="my-auto w-8 h-8 sm:w-10 sm:h-10" src="/img/{{ $imageUrl }}" alt="{{ $imageUrl }}" />
+            <Image class="my-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full" src="{{ $imageUrl ? asset("storage/icons/" . $imageUrl) : "/img/user.png" }}" alt="{{ $imageUrl ? $imageUrl : "image icon" }}" />
         </a>
         <div class="self-center">
             @if ($featured ?? false)
