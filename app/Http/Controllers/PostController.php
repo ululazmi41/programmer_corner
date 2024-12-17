@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use App\Models\Corner;
 use App\Models\Post;
 use App\Models\User;
@@ -47,7 +48,7 @@ class PostController extends Controller
 
         $user = User::where('id', Auth::user()->id)->first();
         $corner = Corner::where('id', $request->corner_id)->first();
-        
+
         $joined = $user->corners->contains($corner->id);
         $owner = $user->createdCorners->contains($corner);
         if (!$joined && !$owner) {
@@ -67,9 +68,28 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
+    public function show(String $id)
     {
-        //
+        $post = Post::where('id', $id)->with([
+            'user',
+            'corner',
+            'comments' => function ($query) {
+                $query->whereNull('parent_id');
+            },
+            'comments.replies',
+        ])->firstOrFail();
+
+        $post->likes = rand(1, 900);
+
+        foreach ($post->comments as $comment) {
+            $comment->likes = rand(1, 900);
+
+            foreach ($comment->replies as $reply) {
+                $reply->likes = rand(1, 900);
+            }
+        }
+
+        return view('posts.show', compact('post'));
     }
 
     /**

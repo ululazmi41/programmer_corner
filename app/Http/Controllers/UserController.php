@@ -256,7 +256,7 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function modifySettings(Request $request)
+    public function put(Request $request)
     {
         if ($request->type == "password") {
             $rule =  ['required', 'confirmed', Password::min(6)];
@@ -282,6 +282,8 @@ class UserController extends Controller
                 $user->username = $request->value;
             } else if ($request->type == "name") {
                 $user->name = $request->value;
+            } else if ($request->type == "description") {
+                $user->description = $request->value;
             } else {
                 return response()->json([
                     "type" => $request->type,

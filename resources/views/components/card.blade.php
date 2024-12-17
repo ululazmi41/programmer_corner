@@ -17,12 +17,14 @@
                     <p class="text-xs leading-tight text-gray-900">featured</p>
                 </div>
             @endif
-            <div class="text-xs sm:text-md font-bold leading-tight line-clamp-2">{!! $title !!}</div>
+            <a href="/posts/{{ $id ? $id : '' }}">
+                <div class="text-xs sm:text-md font-bold leading-tight line-clamp-2">{!! $title !!}</div>
+            </a>
             <div class="text-xs text-gray-400">{{ $author }} • {{ $date }}</div>
         </div>
         <div class="hidden sm:block"></div>
         <div class="col-span-2 sm:col-span-1">
-            <a href="/">
+            <a href="/posts/{{ $id ? $id : '' }}">
                 <p class="leading-tight text-xs md:text-sm line-clamp-3">
                     {!! $description !!}
                 </p>

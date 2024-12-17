@@ -1,19 +1,32 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CornerController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('home');
+    $posts = [];
+    
+    return view('home', compact('posts'));
+});
+
+Route::controller(CommentController::class)->group(function () {
+    Route::get('/comments', function () {
+        return Comment::all();
+    });
+    Route::post('/comments', 'store')->middleware('auth');
+    Route::delete('/comments/{comment}', 'store')->middleware('auth');
 });
 
 Route::controller(PostController::class)->group(function () {
     Route::get('/corners/{id}/create-post', 'create')->middleware('auth');
+    Route::get('/posts/{id}', 'show')->middleware('auth')->name('posts.show');
     Route::post('/posts', 'store')->name('post.post')->middleware('auth');
 });
 
@@ -36,7 +49,7 @@ Route::controller(UserController::class)->group(function () {
 
     Route::prefix("settings")->group(function () {
         Route::get('/', 'settings')->middleware('auth');
-        Route::post('/', 'modifySettings')->middleware('auth');
+        Route::post('/', 'put')->middleware('auth');
         Route::post("icon", 'setIcon');
         Route::delete('icon', 'deleteIcon');
     });

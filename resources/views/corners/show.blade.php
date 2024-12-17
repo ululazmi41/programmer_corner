@@ -59,7 +59,9 @@
                 <div class="mt-2 h-px bg-gray-200"></div>
                 @foreach ($posts as $post)
                     <x-card
+                    :id="$post->id"
                     :status="$post['status']"
+                    :corner="$post->corner->handle"
                     author="{{ $post->user->username }}"
                     date="{{ $post->created_at->format('j F Y') }}"
                     imageUrl="{{ $post->user->image_url }}"

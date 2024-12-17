@@ -17,7 +17,7 @@
             <image id="icon" class="w-16 h-16 rounded-full" src="{{ $user["image_url"] ? asset('storage/icons/' . $user["image_url"]) : "/img/user.png" }}" alt="profile picture" />
             <p class="font-bold text-xl leading-tight">{{ $user["name"] }}</p>
             <p class="text-gray-400 leading-tight">{{ '@' }}{{ $user["username"] }}</p>
-            <p>TODO: User Description.</p>
+            <p>{{ $user["description"] }}</p>
             <p class="text-sm text-gray-400">Joined {{ $user->created_at->format('j F Y') }}
             </p>
             <div class="flex gap-4 mt-2">

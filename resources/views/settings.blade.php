@@ -64,6 +64,13 @@
                         </div>
                     </div>
                     <div class="flex justify-between">
+                        <p class="text-xs lg:text-base text-gray-500 leading-3">Description</p>
+                        <div class="flex gap-2 cursor-pointer items-center" onclick="edit('description')">
+                            <p id="description" class="text-xs lg:text-base leading-3">{{ $user['description'] }}</p>
+                            <x-heroicon-o-chevron-right class="w-4 h-4" />
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
                         <p class="text-xs lg:text-base text-gray-500 leading-3">Email</p>
                         <div class="flex gap-2 cursor-pointer items-center" onclick="edit('email')">
                             <p id="email" class="text-xs lg:text-base leading-3">{{ $user['email'] }}</p>

@@ -64,7 +64,7 @@ class CornerController extends Controller
     public function show(String $handle)
     {
         $corner = Corner::where('handle', $handle)->firstOrFail();
-        $posts = Post::where('corner_id', $corner->id)->with('user')->get();
+        $posts = Post::where('corner_id', $corner->id)->with('user', 'corner')->get();
 
         $owner = false;
         $joined = false;
