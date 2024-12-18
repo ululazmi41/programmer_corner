@@ -17,19 +17,19 @@
                 {{ $comment->created_at->diffForHumans() }}</p>
         </div>
     </div>
-    <p class="text-xs lg:text-sm mt-1">{{ $comment->body }}</p>
+    <p id="comment-{{ $comment->id }}-body" class="text-xs lg:text-sm mt-1">{{ $comment->body }}</p>
     <div class="flex justify-between mt-2">
         <div class="flex gap-2 sm:gap-3">
-            <div id="comment-{{ $comment->id }}-dislike" onclick="toggleCommentLike('comment-{{ $comment->id }}')"
-                class="{{ $liked ?? false ? 'block' : 'hidden' }} text-red-500 hover:text-red-700 flex items-center gap-1 cursor-pointer">
+            <div id="comment-{{ $comment->id }}-dislike" onclick="toggleCommentLike('{{ $comment->id }}')"
+                class="{{ $comment->liked ?? false ? 'block' : 'hidden' }} text-red-500 hover:text-red-700 flex items-center gap-1 cursor-pointer">
                 <x-heroicon-s-heart class="w-4 h-4" />
-                <p class="text-xs sm:text-sm leading-tight">{{ intval($comment->likes) + 1 }} <span
+                <p class="text-xs sm:text-sm leading-tight">{{ intval($comment->likesCount) + intval(!$comment->liked) }} <span
                         class="hidden sm:inline">likes</span></p>
             </div>
-            <div id="comment-{{ $comment->id }}-like" onclick="toggleCommentLike('comment-{{ $comment->id }}')"
-                class="{{ $liked ?? false ? 'hidden' : 'block' }} text-gray-500 hover:text-gray-700 flex items-center gap-1 cursor-pointer">
+            <div id="comment-{{ $comment->id }}-like" onclick="toggleCommentLike('{{ $comment->id }}')"
+                class="{{ $comment->liked ?? false ? 'hidden' : 'block' }} text-gray-500 hover:text-gray-700 flex items-center gap-1 cursor-pointer">
                 <x-heroicon-o-heart class="w-4 h-4" />
-                <p class="text-xs sm:text-sm leading-tight">{{ $comment->likes }} <span
+                <p class="text-xs sm:text-sm leading-tight">{{ intval($comment->likesCount) - intval($comment->liked) }} <span
                         class="hidden sm:inline">likes</span></p>
             </div>
             @if ($hideReply == false)
@@ -60,6 +60,32 @@
                 <p class="text-xs sm:text-sm leading-tight">{{ rand(0, 999) }} <span
                         class="hidden sm:inline">views</span></p>
             </div>
+            @auth
+                @if ($comment->user_id == Auth::id())
+                    <div class="relative inline-block text-left">
+                        <input type="checkbox" id="comment-{{ $comment->id }}-dropdown-toggle" class="hidden peer" />
+                        <label for="comment-{{ $comment->id }}-dropdown-toggle">
+                            <x-heroicon-o-ellipsis-horizontal class="w-6 h-6 text-gray-400 cursor-pointer" />
+                        </label>
+
+                        <div id="comment-{{ $comment->id }}-dropdown-menu"
+                            class="hidden peer-checked:block absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
+                            role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                            <div class="py-2 px-1 grid gap-2" role="none">
+                                <form
+                                    action="/comments/{{ $comment->id }}"
+                                    method="POST"
+                                    class="flex gap-2 items-center px-4 text-sm text-gray-500 hover:text-gray-700"
+                                    role="menuitem" tabindex="-1" id="menu-item-1">
+                                    @csrf
+                                    @method("DELETE")
+                                    <button type="submit">delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            @endauth
         </div>
         <div id="bookmarked#{{ $comment->id }}" onclick="toggleBookmark('{{ $comment->id }}')"
             class="{{ $bookmark ?? false ? 'block' : 'hidden' }}">
@@ -71,6 +97,17 @@
         </div>
     </div>
     <script>
+        document.addEventListener('click', () => {
+            const dropdownToggle = document.getElementById('comment-{{ $comment->id }}-dropdown-toggle');
+            const dropdownMenu = document.getElementById('comment-{{ $comment->id }}-dropdown-menu');
+
+            if (dropdownMenu !== null) {
+                if (!dropdownMenu.contains(event.target) && event.target !== dropdownToggle) {
+                    dropdownToggle.checked = false;
+                }
+            }
+        });
+
         function showLoading(loadingId) {
             const loading = document.getElementById(`${loadingId}`);
             loading.classList.remove('hidden');
@@ -88,9 +125,10 @@
             const solid = document.getElementById(solidId);
             outline.classList.toggle('hidden');
             solid.classList.toggle('hidden');
-            
+
             if (comment.classList.contains('hidden')) {
                 showLoading(loadingId);
+
                 setTimeout(() => {
                     hideLoading(loadingId);
 
@@ -101,9 +139,25 @@
             }
         }
 
-        function toggleCommentLike(baseId) {
-            const likeButton = document.getElementById(`${baseId}-like`);
-            const dislikeButton = document.getElementById(`${baseId}-dislike`);
+        function sendCommentLike(commentId) {
+            let formData = new FormData();
+            formData.append("type", 'comment');
+            formData.append("id", commentId);
+
+            fetch('/likes', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: formData,
+            });
+        }
+
+        function toggleCommentLike(commentId) {
+            sendCommentLike(commentId);
+            const likeButton = document.getElementById(`comment-${commentId}-like`);
+            const dislikeButton = document.getElementById(`comment-${commentId}-dislike`);
 
             dislikeButton.classList.toggle("hidden");
             dislikeButton.classList.toggle("block");

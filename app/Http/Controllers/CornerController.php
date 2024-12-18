@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use function App\Helpers\getTrendingPosts;
+
 class CornerController extends Controller
 {
     /**
@@ -18,7 +20,14 @@ class CornerController extends Controller
     {
         $corners = Corner::all();
 
-        return view('corners.index', compact('corners'));
+        $trendingPosts = getTrendingPosts(3);
+
+        foreach ($trendingPosts as $post) {
+            $post->likesCount = count($post->likes);
+            $post->commentsCount = count($post->comments);
+        }
+
+        return view('corners.index', compact('corners', 'trendingPosts'));
     }
 
     /**
@@ -26,7 +35,14 @@ class CornerController extends Controller
      */
     public function create()
     {
-        return view('/corners/create');
+        $trendingPosts = getTrendingPosts(3);
+
+        foreach ($trendingPosts as $post) {
+            $post->likesCount = count($post->likes);
+            $post->commentsCount = count($post->comments);
+        }
+
+        return view('/corners/create', compact('trendingPosts'));
     }
 
     /**
@@ -64,7 +80,13 @@ class CornerController extends Controller
     public function show(String $handle)
     {
         $corner = Corner::where('handle', $handle)->firstOrFail();
-        $posts = Post::where('corner_id', $corner->id)->with('user', 'corner')->get();
+        $posts = Post::where('corner_id', $corner->id)->with('user', 'corner', 'comments', 'likes')->get();
+
+        foreach ($posts as $post) {
+            $post->liked = $post->likes->contains('user_id', Auth::id());
+            $post->likesCount = count($post->likes);
+            $post->commentsCount = count($post->comments);
+        }
 
         $owner = false;
         $joined = false;
@@ -74,7 +96,13 @@ class CornerController extends Controller
             $joined = $user->corners->contains($corner->id);
         }
 
-        return view("corners.show", compact('corner', 'joined', 'owner', 'posts'));
+        $trendingPosts = getTrendingPosts(3);
+        foreach ($trendingPosts as $post) {
+            $post->likesCount = count($post->likes);
+            $post->commentsCount = count($post->comments);
+        }
+
+        return view("corners.show", compact('corner', 'joined', 'owner', 'posts', 'trendingPosts'));
     }
 
     /**

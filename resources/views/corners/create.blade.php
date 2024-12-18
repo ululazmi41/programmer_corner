@@ -24,7 +24,7 @@
 <x-layout>
     <div class="flex justify-between md:gap-8 pt-12 md:pt-16">
         <x-left />
-        <div class="w-full">
+        <div class="w-full md:w-3/5">
             <form class="mx-auto" action="create-corner" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div>
@@ -85,7 +85,7 @@
                 </div>
             </form>
         </div>
-        <x-right />
+        <x-right :$trendingPosts />
     </div>
     <script>
         function deleteBanner(type) {

@@ -11,24 +11,27 @@
                     </div>
                 </div>
             @else
-                <div class="flex flex-col bg-blue-500">
+                <div class="flex flex-col mb-5">
                     @foreach ($posts as $post)
                         <x-card
-                        :status="$post['status']"
-                        author="{{ $post['author'] }}"
-                        date="{{ $post['date'] }}"
-                        imageUrl="{{ $post['image_url'] }}"
-                        title="{{ $post['title'] }}"
-                        description="{{ $post['description'] }}"
-                        likes="{{ $post['likes'] }}"
-                        views="{{ $post['views'] }}"
-                        comments="{{ $post['comments'] }}"
-                        :liked="$post['liked']"
-                        :bookmark="$post['bookmark']" />
+                            type="post"
+                            :id="$post->id"
+                            :status="$post['status']"
+                            :corner="$post->corner->handle"
+                            author="{{ $post->user->username }}"
+                            date="{{ $post->created_at->format('j F Y') }}"
+                            imageUrl="{{ $post->user->image_url }}"
+                            title="{{ $post->title }}"
+                            description="{{ $post->content }}"
+                            likes="{{ $post->likesCount }}"
+                            views="{{ rand(0, 999) }}"
+                            comments="{{ $post->commentsCount }}"
+                            :liked="$post->liked"
+                            :bookmark="$post['bookmark']" />
                     @endforeach
                 </div>
             @endif
         </div>
-        <x-right />
+        <x-right :$trendingPosts />
     </div>
 </x-layout>

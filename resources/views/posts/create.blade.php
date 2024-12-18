@@ -24,7 +24,7 @@
 <x-layout>
     <div class="flex justify-between md:gap-8 pt-12 md:pt-16">
         <x-left />
-        <div class="w-full px-4 lg:p-0">
+        <div class="w-full md:w-3/5 px-4 lg:p-0">
             <form class="mx-auto" action="/posts" method="POST">
                 @csrf
                 <input type="hidden" name="corner_id" value="{{ $corner['id'] }}">
@@ -47,6 +47,6 @@
                 </div>
             </form>
         </div>
-        <x-right />
+        <x-right :$trendingPosts />
     </div>
 </x-layout>

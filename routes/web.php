@@ -2,26 +2,55 @@
 
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CornerController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use App\Models\Comment;
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use function App\Helpers\getTrendingPosts;
+
 Route::get('/', function () {
-    $posts = [];
-    
-    return view('home', compact('posts'));
+    $posts = Post::all();
+    $trendingPosts = getTrendingPosts(3);
+
+    foreach ($trendingPosts as $post) {
+        $post->likesCount = count($post->likes);
+        $post->commentsCount = count($post->comments);
+    }
+
+    return view('home', compact('posts', 'trendingPosts'));
 });
+
+Route::get('/test', function () {
+    $posts = Post::select('posts.*')
+    ->selectRaw('
+        (SELECT COUNT(*) FROM likes WHERE likes.likeable_id = posts.id AND likes.likeable_type = "App\\Models\\Post") 
+        + 
+        (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS total_count
+    ')
+    ->orderByDesc('total_count')
+    ->take(5)
+    ->get();
+
+    dd($posts);
+});
+
+Route::controller(LikeController::class)->group(function () {
+    Route::post('/likes', 'store');
+    Route::delete('/likes', 'destroy');
+})->middleware('auth');
 
 Route::controller(CommentController::class)->group(function () {
     Route::get('/comments', function () {
         return Comment::all();
     });
     Route::post('/comments', 'store')->middleware('auth');
-    Route::delete('/comments/{comment}', 'store')->middleware('auth');
+    Route::delete('/comments/{comment}', 'destroy')->middleware('auth');
 });
 
 Route::controller(PostController::class)->group(function () {

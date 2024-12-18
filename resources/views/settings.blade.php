@@ -35,8 +35,8 @@
     </form>
     <div class="flex justify-between md:gap-8 pt-12 md:pt-16">
         <x-left />
-        <div class="w-full">
-            <div class="mx-auto w-5/6 lg:w-4/6">
+        <div class="w-full md:w-3/5">
+            <div class="mx-auto w-4/6 lg:w-5/6">
                 <h1 class="text-md lg:text-2xl text-gray-700 font-bold">Settings</h1>
                 <div class="flex mt-4 items-center justify-between lg:justify-start lg:gap-2">
                     <image id="icon" class="w-12 h-12" src="{{ $user["image_url"] ? asset('storage/icons/' . $user["image_url"]) : "/img/user.png" }}" alt="profile picture" />
@@ -84,7 +84,7 @@
                 </div>
             </div>
         </div>
-        <x-right />
+        <x-right :$trendingPosts />
     </div>
 
     <script>

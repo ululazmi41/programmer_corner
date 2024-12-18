@@ -1,4 +1,4 @@
-<x-user.layout :user="$user">
+<x-user.layout :$user :$trendingPosts>
     @if(empty($posts))
         <div class="h-3/5 grid px-4 w-5/6 m-auto md:w-full">
             <div class="grid m-auto text-center">
@@ -10,17 +10,20 @@
     @else
         @foreach ($posts as $post)
             <x-card
-            :status="$post['status']"
-            author="{{ $post['author'] }}"
-            date="{{ $post['date'] }}"
-            imageUrl="{{ $post['image_url'] }}"
-            title="{{ $post['title'] }}"
-            description="{{ $post['description'] }}"
-            likes="{{ $post['likes'] }}"
-            views="{{ $post['views'] }}"
-            comments="{{ $post['comments'] }}"
-            :liked="$post['liked']"
-            :bookmark="$post['bookmark']" />
+                type="post"
+                id="1"
+                :status="$post['status']"
+                corner="1"
+                :author="$post['author']"
+                :date="Date::now()->format('j F Y')"
+                :imageUrl="Auth::user()->image_url"
+                :title="$post['title']"
+                :description="$post['description']"
+                :likes="$post['likes']"
+                views="1"
+                :comments="$post['comments']"
+                :liked="false"
+                :bookmark="$post['bookmark']" />
         @endforeach
     @endif
 </x-user.layout>

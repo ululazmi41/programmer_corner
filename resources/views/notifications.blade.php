@@ -54,6 +54,6 @@
                 @endforeach
             </div>
         </div>
-        <x-right />
+        <x-right :$trendingPosts />
     </div>
 </x-layout>

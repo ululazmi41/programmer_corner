@@ -9,7 +9,7 @@
 <x-layout>
     <div class="flex justify-between md:gap-8 pt-12 md:pt-16 mb-16">
         <x-left />
-        <div class="w-full mx-auto px-4 sm:px-0">
+        <div class="w-full md:w-3/5 mx-auto px-4 sm:px-0">
             <div>
                 <div id="bannerPlaceholder" class="{{ $corner["icon_url"] != "" ? "hidden" : "" }} w-full h-16 sm:h-24 bg-gray-300 rounded-tl-lg rounded-t-lg"></div>
                 <img src="{{ $corner["banner_url"] != "" ? asset("storage/banners/{$corner["banner_url"]}") : "" }}" id="imgBanner" alt="banner" class="{{ $corner["banner_url"] != "" ? "" : "hidden" }} w-full h-16 sm:h-24 object-cover rounded-t-lg transition-all duration-300 ease-in-out" />
@@ -59,6 +59,7 @@
                 <div class="mt-2 h-px bg-gray-200"></div>
                 @foreach ($posts as $post)
                     <x-card
+                    type="post"
                     :id="$post->id"
                     :status="$post['status']"
                     :corner="$post->corner->handle"
@@ -67,14 +68,14 @@
                     imageUrl="{{ $post->user->image_url }}"
                     title="{{ $post->title }}"
                     description="{{ $post->content }}"
-                    likes="{{ rand(0, 999) }}"
+                    likes="{{ $post->likesCount }}"
                     views="{{ rand(0, 999) }}"
-                    comments="{{ rand(0, 999) }}"
-                    :liked="$post['liked']"
+                    comments="{{ $post->commentsCount }}"
+                    :liked="$post->liked"
                     :bookmark="$post['bookmark']" />
                 @endforeach
             </div>
         </div>
-        <x-right />
+        <x-right :$trendingPosts />
     </div>
 </x-layout>

@@ -12,13 +12,17 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
+use function App\Helpers\getTrendingPosts;
+
 class UserController extends Controller
 {
-    public function show(String $username) {
+    public function show(String $username)
+    {
         $user = User::where('username', $username)->first();
-            
+
         $posts = [
             [
+                "id" => "1",
                 "status" => UserOverview::POST,
                 "author" => "Python",
                 "date" => "1/12/2024",
@@ -30,9 +34,10 @@ class UserController extends Controller
                 "views" => "1.2K",
                 "liked" => "true",
                 "featured" => "true",
-                "bookmark" => "true",
+                "bookmark" => true,
             ],
             [
+                "id" => "2",
                 "status" => UserOverview::COMMENT,
                 "author" => "Golang",
                 "date" => "3/12/2024",
@@ -44,9 +49,10 @@ class UserController extends Controller
                 "views" => "419",
                 "liked" => "false",
                 "featured" => "false",
-                "bookmark" => "false",
+                "bookmark" => false,
             ],
             [
+                "id" => "3",
                 "status" => UserOverview::POST,
                 "author" => "Rust",
                 "date" => "26/11/2024",
@@ -58,14 +64,21 @@ class UserController extends Controller
                 "views" => "122",
                 "liked" => "false",
                 "featured" => "false",
-                "bookmark" => "true",
+                "bookmark" => true,
             ],
         ];
-    
-        return view('users.index', compact('user', 'posts'));
+
+        $trendingPosts = getTrendingPosts(3);
+        foreach ($trendingPosts as $post) {
+            $post->likesCount = count($post->likes);
+            $post->commentsCount = count($post->comments);
+        }
+
+        return view('users.index', compact('user', 'posts', 'trendingPosts'));
     }
 
-    public function posts(String $username) {
+    public function posts(String $username)
+    {
         $user = User::where('username', $username)->first();
         
         $posts = [
@@ -96,15 +109,23 @@ class UserController extends Controller
                 "bookmark" => "true",
             ],
         ];
+
+        $trendingPosts = getTrendingPosts(3);
+        foreach ($trendingPosts as $post) {
+            $post->likesCount = count($post->likes);
+            $post->commentsCount = count($post->comments);
+        }
     
-        return view('users.posts', compact('user', 'posts'));
+        return view('users.posts', compact('user', 'posts', 'trendingPosts'));
     }
 
-    public function comments(String $username) {
+    public function comments(String $username)
+    {
         $user = User::where('username', $username)->first();
         
         $posts = [
             [
+                "id" => "1",
                 "author" => "Golang",
                 "date" => "3/12/2024",
                 "image_url" => "go.png",
@@ -118,8 +139,14 @@ class UserController extends Controller
                 "bookmark" => "false",
             ],
         ];
+
+        $trendingPosts = getTrendingPosts(3);
+        foreach ($trendingPosts as $post) {
+            $post->likesCount = count($post->likes);
+            $post->commentsCount = count($post->comments);
+        }
     
-        return view('users.comments', compact('user', 'posts'));
+        return view('users.comments', compact('user', 'posts', 'trendingPosts'));
     }
 
     public function notifications() {
@@ -197,15 +224,27 @@ class UserController extends Controller
                 "bookmark" => "true",
             ],
         ];
-    
-        return view('notifications', compact('notifications'));
+        
+        $trendingPosts = getTrendingPosts(3);
+        foreach ($trendingPosts as $post) {
+            $post->likesCount = count($post->likes);
+            $post->commentsCount = count($post->comments);
+        }
+
+        return view('notifications', compact('notifications', 'trendingPosts'));
     }
 
     public function settings()
     {
         $user = Auth::user();
 
-        return view('settings', compact('user'));
+        $trendingPosts = getTrendingPosts(3);
+        foreach ($trendingPosts as $post) {
+            $post->likesCount = count($post->likes);
+            $post->commentsCount = count($post->comments);
+        }
+
+        return view('settings', compact('user', 'trendingPosts'));
     }
 
     public function deleteIcon()
@@ -259,13 +298,13 @@ class UserController extends Controller
     public function put(Request $request)
     {
         if ($request->type == "password") {
-            $rule =  ['required', 'confirmed', Password::min(6)];
+            $rule = ['required', 'confirmed', Password::min(6)];
         } else if ($request->type == "email") {
-            $rule =  ['required', 'email', 'unique:users,email'];
+            $rule = ['required', 'email', 'unique:users,email'];
         } else if ($request->type == "username") {
-            $rule =  ['required', 'unique:users,username'];
+            $rule = ['required', 'unique:users,username'];
         } else {
-            $rule =  ['required'];
+            $rule = ['required'];
         }
 
         $validation = Validator::make($request->all(), [

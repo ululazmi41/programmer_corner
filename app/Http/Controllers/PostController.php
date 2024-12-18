@@ -9,6 +9,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use function App\Helpers\getTrendingPosts;
+
 class PostController extends Controller
 {
     /**
@@ -25,15 +27,22 @@ class PostController extends Controller
     public function create(String $handle)
     {
         $corner = Corner::where('handle', $handle)->firstOrFail();
-
         $user = User::where('id', Auth::user()->id)->first();
+
         $joined = $user->corners->contains($corner->id);
         $owner = $user->createdCorners->contains($corner);
         if (!$joined && !$owner) {
             return redirect('/');
         }
 
-        return view('posts.create', compact('corner'));
+        $trendingPosts = getTrendingPosts(3);
+
+        foreach ($trendingPosts as $trendingPost) {
+            $trendingPost->likesCount = count($trendingPost->likes);
+            $trendingPost->commentsCount = count($trendingPost->comments);
+        }
+
+        return view('posts.create', compact('corner', 'trendingPosts'));
     }
 
     /**
@@ -76,20 +85,40 @@ class PostController extends Controller
             'comments' => function ($query) {
                 $query->whereNull('parent_id');
             },
+            'comments.likes',
             'comments.replies',
         ])->firstOrFail();
 
-        $post->likes = rand(1, 900);
+        $post->liked = $post->likes->contains('user_id', Auth::id());
+        $post->likesCount = count($post->likes);
 
         foreach ($post->comments as $comment) {
-            $comment->likes = rand(1, 900);
+            $comment->likesCount = count($comment->likes);
+            $comment->liked = $comment->likes->contains('user_id', Auth::id());
+            $comment->lastActivity = $comment->updated_at;
 
             foreach ($comment->replies as $reply) {
-                $reply->likes = rand(1, 900);
+                $reply->likesCount = count($reply->likes);
+                $reply->liked = $reply->likes->contains('user_id', Auth::id());
+
+                if ($reply->updated_at->timestamp > $comment->lastActivity->timestamp) {
+                    $comment->lastActivity = $reply->updated_at;
+                }
             }
         }
 
-        return view('posts.show', compact('post'));
+        $post->comments = $post->comments->sortBy(function ($comment) {
+            return -$comment->lastActivity->timestamp;
+        });
+
+        $trendingPosts = getTrendingPosts(3);
+
+        foreach ($trendingPosts as $trendingPost) {
+            $trendingPost->likesCount = count($trendingPost->likes);
+            $trendingPost->commentsCount = count($trendingPost->comments);
+        }
+
+        return view('posts.show', compact('post', 'trendingPosts'));
     }
 
     /**

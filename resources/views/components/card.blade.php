@@ -31,16 +31,16 @@
             </a>
             <div class="flex justify-between mt-2">
                 <div class="flex gap-4 sm:gap-3">
-                    <div id="dislike#{{ $imageUrl }}" onclick="toggleLike('{{ $imageUrl }}')"
+                    <div id="{{ $type }}-{{ $id }}-dislike" onclick="toggleLike('{{ $id }}', 'post', {{ Auth::check() }})"
                         class="{{ $liked ? 'block' : 'hidden' }} text-red-500 hover:text-red-500 flex items-center gap-1 cursor-pointer">
                         <x-heroicon-s-heart class="w-4 h-4" />
-                        <p class="text-xs sm:text-sm leading-tight">{{ intval($likes) + 1 }} <span
+                        <p class="text-xs sm:text-sm leading-tight">{{ intval($likes) + intval(!$liked) }} <span
                                 class="hidden sm:inline">likes</span></p>
                     </div>
-                    <div id="like#{{ $imageUrl }}" onclick="toggleLike('{{ $imageUrl }}')"
+                    <div id="{{ $type }}-{{ $id }}-like" onclick="toggleLike('{{ $id }}', 'post', {{ Auth::check() }})"
                         class="{{ $liked ? 'hidden' : 'block' }} text-gray-500 hover:text-gray-500 flex items-center gap-1 cursor-pointer">
                         <x-heroicon-o-heart class="w-4 h-4" />
-                        <p class="text-xs sm:text-sm leading-tight">{{ $likes }} <span
+                        <p class="text-xs sm:text-sm leading-tight">{{ intval($likes) - intval($liked) }} <span
                                 class="hidden sm:inline">likes</span></p>
                     </div>
                     <div class="flex items-center gap-1 text-gray-500 hover:text-gray-700 cursor-pointer">
@@ -68,9 +68,28 @@
     <div class="mt-2 bg-gray-300 h-px w-full"></div>
 
     <script>
-        function toggleLike(image_url) {
-            const likeButton = document.getElementById(`like#${image_url}`);
-            const dislikeButton = document.getElementById(`dislike#${image_url}`);
+        function sendLike(id, type) {
+            let formData = new FormData();
+            formData.append("type", type);
+            formData.append("id", id);
+
+            fetch('/likes', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: formData,
+            });
+        }
+
+        function toggleLike(id, type, loggedIn) {
+            if (!loggedIn) {
+                return;
+            }
+            sendLike(id, type);
+            const likeButton = document.getElementById(`${type}-${id}-like`);
+            const dislikeButton = document.getElementById(`${type}-${id}-dislike`);
 
             dislikeButton.classList.toggle("hidden");
             dislikeButton.classList.toggle("block");
