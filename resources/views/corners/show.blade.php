@@ -27,19 +27,19 @@
                         </div>
                     </div>
                     <div class="flex gap-2 items-center">
-                        @if ($owner || $joined)
+                        @if ($joined)
                             <a href="{{ getSubPage() . '/create-post' }}">
                                 <button class="text-xs sm:text-sm h-max lg:text-base text-blue-500 hover:text-white border border-blue-500 hover:bg-blue-500 rounded-lg py-1 px-3 lg:px-4 ml-auto">
                                     Create Post
                                 </button>
                             </a>
                         @endif
-                        @if ($owner)
+                        @if ($role == 'owner')
                             <button class="text-xs sm:text-sm h-max lg:text-base text-white bg-blue-500 hover:bg-blue-700 rounded-lg py-1 px-3 lg:px-4 ml-auto">
                                 Owner
                             </button>
                         @else
-                            @if ($joined)
+                            @if ($role == 'member')
                                 <a href="{{ getSubPage() . '/leave' }}" class="group">
                                     <button class="text-xs sm:text-sm h-max lg:text-base text-white bg-blue-500 hover:bg-blue-700 rounded-lg py-1 px-3 lg:px-4 ml-auto">
                                         Leave
@@ -59,23 +59,25 @@
                 <div class="mt-2 h-px bg-gray-200"></div>
                 @foreach ($posts as $post)
                     <x-card
-                    type="post"
-                    :id="$post->id"
-                    :status="$post['status']"
-                    :corner="$post->corner->handle"
-                    author="{{ $post->user->username }}"
-                    date="{{ $post->created_at->format('j F Y') }}"
-                    imageUrl="{{ $post->user->image_url }}"
-                    title="{{ $post->title }}"
-                    description="{{ $post->content }}"
-                    likes="{{ $post->likesCount }}"
-                    views="{{ rand(0, 999) }}"
-                    comments="{{ $post->commentsCount }}"
-                    :liked="$post->liked"
-                    :bookmark="$post['bookmark']" />
+                        :$role
+                        :type="\App\Enums\ContentType::POST"
+                        :id="$post->id"
+                        :status="$post['status']"
+                        :corner="$post->corner->handle"
+                        author="{{ $post->user->username }}"
+                        authorId="{{ $post->user->id }}"
+                        date="{{ $post->created_at->format('j F Y') }}"
+                        imageUrl="{{ $post->user->image_url }}"
+                        title="{{ $post->title }}"
+                        description="{{ $post->content }}"
+                        likes="{{ $post->likesCount }}"
+                        views="{{ $post->viewsCount }}"
+                        comments="{{ $post->commentsCount }}"
+                        :liked="$post->liked"
+                        :bookmark="$post['bookmark']" />
                 @endforeach
             </div>
         </div>
-        <x-right :$trendingPosts />
+        <x-trending />
     </div>
 </x-layout>

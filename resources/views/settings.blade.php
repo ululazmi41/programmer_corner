@@ -84,7 +84,7 @@
                 </div>
             </div>
         </div>
-        <x-right :$trendingPosts />
+        <x-trending />
     </div>
 
     <script>

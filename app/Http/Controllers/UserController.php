@@ -68,13 +68,7 @@ class UserController extends Controller
             ],
         ];
 
-        $trendingPosts = getTrendingPosts(3);
-        foreach ($trendingPosts as $post) {
-            $post->likesCount = count($post->likes);
-            $post->commentsCount = count($post->comments);
-        }
-
-        return view('users.index', compact('user', 'posts', 'trendingPosts'));
+        return view('users.index', compact('user', 'posts'));
     }
 
     public function posts(String $username)
@@ -109,14 +103,8 @@ class UserController extends Controller
                 "bookmark" => "true",
             ],
         ];
-
-        $trendingPosts = getTrendingPosts(3);
-        foreach ($trendingPosts as $post) {
-            $post->likesCount = count($post->likes);
-            $post->commentsCount = count($post->comments);
-        }
     
-        return view('users.posts', compact('user', 'posts', 'trendingPosts'));
+        return view('users.posts', compact('user', 'posts'));
     }
 
     public function comments(String $username)
@@ -140,13 +128,7 @@ class UserController extends Controller
             ],
         ];
 
-        $trendingPosts = getTrendingPosts(3);
-        foreach ($trendingPosts as $post) {
-            $post->likesCount = count($post->likes);
-            $post->commentsCount = count($post->comments);
-        }
-    
-        return view('users.comments', compact('user', 'posts', 'trendingPosts'));
+        return view('users.comments', compact('user', 'posts'));
     }
 
     public function notifications() {
@@ -224,27 +206,15 @@ class UserController extends Controller
                 "bookmark" => "true",
             ],
         ];
-        
-        $trendingPosts = getTrendingPosts(3);
-        foreach ($trendingPosts as $post) {
-            $post->likesCount = count($post->likes);
-            $post->commentsCount = count($post->comments);
-        }
 
-        return view('notifications', compact('notifications', 'trendingPosts'));
+        return view('notifications', compact('notifications'));
     }
 
     public function settings()
     {
         $user = Auth::user();
 
-        $trendingPosts = getTrendingPosts(3);
-        foreach ($trendingPosts as $post) {
-            $post->likesCount = count($post->likes);
-            $post->commentsCount = count($post->comments);
-        }
-
-        return view('settings', compact('user', 'trendingPosts'));
+        return view('settings', compact('user'));
     }
 
     public function deleteIcon()

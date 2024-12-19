@@ -13,14 +13,22 @@
             <div class="lg:w-full mx-auto">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <image
+                        <a href="{{ route('users.show', ['username' => $post->user->username]) }}">
+                            <image
                             class="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
                             src="{{ $post->user->image_url ? asset("/storage/icons/{$post->user->image_url}") : "/img/user.png" }}"
                             alt="{{ $post->user->image_url ? $post->user->image_url : "/img/user.png" }}"
                             />
+                        </a>
                         <div>
-                            <p class="font-semibold text-xs sm:text-base">{{ $post->user->name }}</p>
-                            <p class="text-xs sm:text-sm text-gray-500">{{ $post->user->username }} • {{ $post->created_at->diffForHumans() }}</p>
+                            <a class="block w-max" href="{{ route('users.show', ['username' => $post->user->username]) }}">
+                                <p class="font-semibold text-xs sm:text-base">{{ $post->user->name }}</p>
+                            </a>
+                            <p class="text-xs sm:text-sm text-gray-500">
+                                <a href="{{ route('users.show', ['username' => $post->user->username]) }}">
+                                    {{ $post->user->username }}
+                                </a> • {{ $post->created_at->diffForHumans() }}
+                            </p>
                         </div>
                     </div>
                     <div class="my-4">
@@ -37,7 +45,7 @@
                     </div>
                 </div>
                 <p class="mt-2 text-md md:text-base font-bold">{{ $post->title }}</p>
-                <p class="mt-1 text-sm md:text-md">{{ $post->content }}</p>
+                <p class="mt-1 text-sm md:text-md">{{!! nl2br(e($post->content)) !!}}</p>
                 <div class="flex justify-between mt-2">
                     <div class="flex gap-2 sm:gap-3">
                         <div id="dislike#{{ $post->id }}" onclick="toggleLike('{{ $post->id }}')"
@@ -59,7 +67,7 @@
                         </div>
                         <div class="flex items-center gap-1 text-gray-500 hover:text-gray-700 border border-gray-400 bg-gray-200 px-2 py-1 rounded-lg">
                             <x-heroicon-s-chart-bar class="w-4 h-4" />
-                            <p class="text-xs sm:text-sm leading-tight">{{ rand(0, 999) }} <span
+                            <p class="text-xs sm:text-sm leading-tight">{{ $post->views->count }} <span
                                     class="hidden sm:inline">views</span></p>
                         </div>
                     </div>
@@ -140,6 +148,6 @@
                 bookmarkingButton.classList.toggle("block");
             }
         </script>
-        <x-right :$trendingPosts />
+        <x-trending />
     </div>
 </x-layout>

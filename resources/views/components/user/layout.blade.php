@@ -1,4 +1,4 @@
-@props(['user', 'trendingPosts'])
+@props(['user'])
 
 @php
     function getSubPage() {
@@ -13,7 +13,7 @@
 <x-layout>
     <div class="flex md:gap-4 pt-4 md:pt-16">
         <x-left />
-        <div class="w-full md:w-3/5 py-8 px-4 md:p-0">
+        <div class="w-full md:w-3/5 py-8 px-4 md:p-0 md:pb-4">
             <image id="icon" class="w-16 h-16 rounded-full" src="{{ $user["image_url"] ? asset('storage/icons/' . $user["image_url"]) : "/img/user.png" }}" alt="profile picture" />
             <p class="font-bold text-xl leading-tight">{{ $user["name"] }}</p>
             <p class="text-gray-400 leading-tight">{{ '@' }}{{ $user["username"] }}</p>
@@ -48,6 +48,6 @@
             </div>
             {{ $slot }}
         </div>
-        <x-right :$trendingPosts />
+        <x-trending />
     </div>
 </x-layout>

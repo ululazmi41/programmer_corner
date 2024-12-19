@@ -58,7 +58,7 @@ class User extends Authenticatable
 
     public function corners(): BelongsToMany
     {
-        return $this->belongsToMany(Corner::class);
+        return $this->belongsToMany(Corner::class)->withPivot('role');
     }
 
     public function createdCorners(): HasMany

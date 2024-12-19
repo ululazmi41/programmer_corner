@@ -29,7 +29,7 @@
                 <a href="/notifications">
                     <x-heroicon-o-bell class="w-6 h-6 text-gray-400 cursor-pointer hover:text-gray-500" />
                 </a>
-                <a href="{{ route('user.index', ['username' => Auth::user()->username]) }}">
+                <a href="{{ route('users.show', ['username' => Auth::user()->username]) }}">
                     <x-heroicon-o-user-circle class="w-6 h-6 text-gray-400" />
                 </a>
                 <div class="relative inline-block text-left">

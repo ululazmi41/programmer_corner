@@ -47,6 +47,22 @@
                 </div>
             </form>
         </div>
-        <x-right :$trendingPosts />
+        <x-trending />
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            alter('title');
+            alter('content');
+        });
+
+        function alter(id) {
+            const render = document.querySelector(`#render-${id}`);
+            const input = document.querySelector(`#${id}`);
+            if (input.value != "") {
+                render.innerText = input.value;
+            } else {
+                render.innerText = "Untitle";
+            }
+        }
+    </script>
 </x-layout>

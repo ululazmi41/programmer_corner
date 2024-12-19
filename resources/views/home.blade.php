@@ -16,6 +16,7 @@
                         <x-card
                             type="post"
                             :id="$post->id"
+                            :authorId="$post->user->id"
                             :status="$post['status']"
                             :corner="$post->corner->handle"
                             author="{{ $post->user->username }}"
@@ -24,7 +25,7 @@
                             title="{{ $post->title }}"
                             description="{{ $post->content }}"
                             likes="{{ $post->likesCount }}"
-                            views="{{ rand(0, 999) }}"
+                            views="{{ $post->viewsCount }}"
                             comments="{{ $post->commentsCount }}"
                             :liked="$post->liked"
                             :bookmark="$post['bookmark']" />
@@ -32,6 +33,6 @@
                 </div>
             @endif
         </div>
-        <x-right :$trendingPosts />
+        <x-trending />
     </div>
 </x-layout>

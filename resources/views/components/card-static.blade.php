@@ -1,22 +1,3 @@
-@props([
-    'role' => null,
-    'type' => null,
-    'id',
-    'status' => null.
-    'corner',
-    'author',
-    'authorId',
-    'date',
-    'imageUrl',
-    'title',
-    'description',
-    'likes',
-    'views',
-    'comments',
-    'liked',
-    'bookmark',
-])
-
 @php
     $deleteAction = '';
     if ($type == \App\Enums\ContentType::POST) {
@@ -38,7 +19,10 @@
     @endif
     <div class="grid grid-cols-[max-content_1fr] gap-2 mt-1">
         <a href="/communities" class="m-auto">
-            <Image class="my-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full" src="{{ $imageUrl ? asset("storage/icons/" . $imageUrl) : "/img/user.png" }}" alt="{{ $imageUrl ? $imageUrl : "image icon" }}" />
+            <Image
+            class="my-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full"
+            src="/img/{{ $imageUrl ? $imageUrl : "/img/user.png" }}"
+            alt="{{ $imageUrl ? $imageUrl : "image icon" }}" />
         </a>
         <div class="self-center">
             @if ($featured ?? false)
@@ -83,32 +67,6 @@
                         <p class="text-xs sm:text-sm leading-tight">{{ $views }} <span
                                 class="hidden sm:inline">views</span></p>
                     </div>
-                    @auth
-                        @if ($authorId == Auth::id() || $role == 'owner')
-                            <div class="relative inline-block text-left">
-                                <input type="checkbox" id="card-{{ $id }}-dropdown-toggle" class="hidden peer" />
-                                <label for="card-{{ $id }}-dropdown-toggle">
-                                    <x-heroicon-o-ellipsis-horizontal class="w-6 h-6 text-gray-400 hover:text-gray-700 cursor-pointer" />
-                                </label>
-
-                                <div id="card-{{ $id }}-dropdown-menu"
-                                    class="hidden peer-checked:block absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
-                                    role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-                                    <div class="py-2 px-1 grid gap-2" role="none">
-                                        <form
-                                            action="{{ $deleteAction }}"
-                                            method="POST"
-                                            class="flex gap-2 items-center px-4 text-sm text-gray-500 hover:text-gray-700"
-                                            role="menuitem" tabindex="-1" id="menu-item-1">
-                                            @csrf
-                                            @method("DELETE")
-                                            <button type="submit">delete</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    @endauth
                 </div>
                 <div id="bookmarked#{{ $imageUrl }}" onclick="toggleBookmark('{{ $imageUrl }}')"
                     class="{{ $bookmark ? 'block' : 'hidden' }}">

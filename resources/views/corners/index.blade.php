@@ -5,7 +5,7 @@
             <h1 class="font-bold text-lg text-gray-500">Corners</h1>
             <div class="h-2"></div>
             @if (count($corners) > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 auto-rows-max justify-center">
+                <div class="grid grid-cols-1 md:grid-cols-2 auto-rows-max justify-center">
                     @foreach ($corners as $corner)
                         <a href="/corners/{{ $corner["handle"] }}" class="hover:bg-gray-200 px-4 py-2 rounded-md">
                             <div class="flex items-center gap-4">
@@ -32,6 +32,6 @@
                 </div>
             @endif
         </div>
-        <x-right :$trendingPosts />
+        <x-trending />
     </div>
 </x-layout>

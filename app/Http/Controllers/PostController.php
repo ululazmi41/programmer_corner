@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
-use App\Models\Corner;
 use App\Models\Post;
 use App\Models\User;
+use App\Models\Corner;
+use App\Models\Comment;
+use App\Models\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
-use function App\Helpers\getTrendingPosts;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -35,14 +35,7 @@ class PostController extends Controller
             return redirect('/');
         }
 
-        $trendingPosts = getTrendingPosts(3);
-
-        foreach ($trendingPosts as $trendingPost) {
-            $trendingPost->likesCount = count($trendingPost->likes);
-            $trendingPost->commentsCount = count($trendingPost->comments);
-        }
-
-        return view('posts.create', compact('corner', 'trendingPosts'));
+        return view('posts.create', compact('corner'));
     }
 
     /**
@@ -79,14 +72,27 @@ class PostController extends Controller
      */
     public function show(String $id)
     {
+        if (Post::find($id) == null) {
+            return redirect()->back();
+        }
+
+        if (Post::find($id)->views == null) {
+            Post::find($id)->views()->create();
+        }
+        
+        Post::find($id)->views->increment('count');
+
         $post = Post::where('id', $id)->with([
             'user',
+            'views',
             'corner',
             'comments' => function ($query) {
                 $query->whereNull('parent_id');
             },
+            'comments.views',
             'comments.likes',
             'comments.replies',
+            'comments.replies.views',
         ])->firstOrFail();
 
         $post->liked = $post->likes->contains('user_id', Auth::id());
@@ -97,6 +103,13 @@ class PostController extends Controller
             $comment->liked = $comment->likes->contains('user_id', Auth::id());
             $comment->lastActivity = $comment->updated_at;
 
+            if (Comment::find($comment->id)->views == null) {
+                Comment::find($comment->id)->views()->create();
+            }
+            
+            Comment::find($comment->id)->views->increment('count');
+            $comment->viewsCount = Comment::find($comment->id)->views->count;
+
             foreach ($comment->replies as $reply) {
                 $reply->likesCount = count($reply->likes);
                 $reply->liked = $reply->likes->contains('user_id', Auth::id());
@@ -104,6 +117,13 @@ class PostController extends Controller
                 if ($reply->updated_at->timestamp > $comment->lastActivity->timestamp) {
                     $comment->lastActivity = $reply->updated_at;
                 }
+
+                if (Comment::find($reply->id)->views == null) {
+                    Comment::find($reply->id)->views()->create();
+                }
+
+                Comment::find($reply->id)->views->increment('count');
+                $reply->viewsCount = Comment::find($reply->id)->views->count;
             }
         }
 
@@ -111,14 +131,7 @@ class PostController extends Controller
             return -$comment->lastActivity->timestamp;
         });
 
-        $trendingPosts = getTrendingPosts(3);
-
-        foreach ($trendingPosts as $trendingPost) {
-            $trendingPost->likesCount = count($trendingPost->likes);
-            $trendingPost->commentsCount = count($trendingPost->comments);
-        }
-
-        return view('posts.show', compact('post', 'trendingPosts'));
+        return view('posts.show', compact('post'));
     }
 
     /**
@@ -140,8 +153,11 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy(String $id)
     {
-        //
+        $post = Post::where('id', $id)->first();
+        $post->delete();
+
+        return redirect()->back();
     }
 }

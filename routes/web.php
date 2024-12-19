@@ -12,32 +12,23 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use function App\Helpers\getTrendingPosts;
-
 Route::get('/', function () {
     $posts = Post::all();
-    $trendingPosts = getTrendingPosts(3);
-
-    foreach ($trendingPosts as $post) {
-        $post->likesCount = count($post->likes);
-        $post->commentsCount = count($post->comments);
+    
+    foreach ($posts as $post) {
+        if (Post::find($post->id)->views == null) {
+            Post::find($post->id)->views()->create();
+        }
+    
+        Post::find($post->id)->views->increment('count');
+        $post->viewsCount = Post::find($post->id)->views->count;
     }
 
-    return view('home', compact('posts', 'trendingPosts'));
+    return view('home', compact('posts'));
 });
 
 Route::get('/test', function () {
-    $posts = Post::select('posts.*')
-    ->selectRaw('
-        (SELECT COUNT(*) FROM likes WHERE likes.likeable_id = posts.id AND likes.likeable_type = "App\\Models\\Post") 
-        + 
-        (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS total_count
-    ')
-    ->orderByDesc('total_count')
-    ->take(5)
-    ->get();
-
-    dd($posts);
+    dd(1);
 });
 
 Route::controller(LikeController::class)->group(function () {
@@ -50,13 +41,14 @@ Route::controller(CommentController::class)->group(function () {
         return Comment::all();
     });
     Route::post('/comments', 'store')->middleware('auth');
-    Route::delete('/comments/{comment}', 'destroy')->middleware('auth');
+    Route::delete('/comments/{comment}', 'destroy')->middleware('auth')->name('comments.destroy');
 });
 
 Route::controller(PostController::class)->group(function () {
     Route::get('/corners/{id}/create-post', 'create')->middleware('auth');
-    Route::get('/posts/{id}', 'show')->middleware('auth')->name('posts.show');
+    Route::get('/posts/{id}', 'show')->name('posts.show');
     Route::post('/posts', 'store')->name('post.post')->middleware('auth');
+    Route::delete('/posts/{id}', 'destroy')->middleware('auth')->name('posts.destroy');
 });
 
 Route::controller(CornerController::class)->group(function () {
@@ -71,7 +63,7 @@ Route::controller(CornerController::class)->group(function () {
 
 Route::controller(UserController::class)->group(function () {
     Route::prefix('users')->group(function () {
-        Route::get('{username}', 'show')->name('user.index');
+        Route::get('{username}', 'show')->name('users.show');
         Route::get('{username}/posts', 'posts')->name('user.posts');
         Route::get('{username}/comments', 'comments')->name('user.comments');
     });

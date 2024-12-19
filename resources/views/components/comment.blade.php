@@ -8,13 +8,21 @@
 
 <div>
     <div class="flex items-center gap-2">
-        <image class="w-4 h-4 md:w-8 md:h-8 rounded-full"
+        <a href="{{ route('users.show', ['username' => $comment->user->username]) }}">
+            <image class="w-4 h-4 md:w-8 md:h-8 rounded-full"
             src="{{ $comment->user->image_url ? asset("/storage/icons/{$comment->user->image_url}") : '/img/user.png' }}"
             alt="{{ $comment->user->image_url ? $comment->user->image_url : '/img/user.png' }}" />
+        </a>
         <div>
-            <p class="text-xs lg:text-sm font-semibold">{{ $comment->user->name }}</p>
-            <p class="text-xs lg:text-sm text-gray-500">{{ '@' }}{{ $comment->user->username }} •
-                {{ $comment->created_at->diffForHumans() }}</p>
+            <a href="{{ route('users.show', ['username' => $comment->user->username]) }}">
+                <p class="text-xs lg:text-sm font-semibold">{{ $comment->user->name }}</p>
+            </a>
+            <p class="text-xs lg:text-sm text-gray-500">
+                <a href="{{ route('users.show', ['username' => $comment->user->username]) }}">
+                    {{ '@' }}{{ $comment->user->username }}
+                </a>
+                • {{ $comment->created_at->diffForHumans() }}
+            </p>
         </div>
     </div>
     <p id="comment-{{ $comment->id }}-body" class="text-xs lg:text-sm mt-1">{{ $comment->body }}</p>
@@ -57,7 +65,7 @@
             @endif
             <div class="flex items-center gap-1 text-gray-500 hover:text-gray-700">
                 <x-heroicon-s-chart-bar class="w-4 h-4" />
-                <p class="text-xs sm:text-sm leading-tight">{{ rand(0, 999) }} <span
+                <p class="text-xs sm:text-sm leading-tight">{{ $comment->viewsCount }} <span
                         class="hidden sm:inline">views</span></p>
             </div>
             @auth

@@ -9,8 +9,6 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-use function App\Helpers\getTrendingPosts;
-
 class CornerController extends Controller
 {
     /**
@@ -20,14 +18,7 @@ class CornerController extends Controller
     {
         $corners = Corner::all();
 
-        $trendingPosts = getTrendingPosts(3);
-
-        foreach ($trendingPosts as $post) {
-            $post->likesCount = count($post->likes);
-            $post->commentsCount = count($post->comments);
-        }
-
-        return view('corners.index', compact('corners', 'trendingPosts'));
+        return view('corners.index', compact('corners'));
     }
 
     /**
@@ -35,14 +26,7 @@ class CornerController extends Controller
      */
     public function create()
     {
-        $trendingPosts = getTrendingPosts(3);
-
-        foreach ($trendingPosts as $post) {
-            $post->likesCount = count($post->likes);
-            $post->commentsCount = count($post->comments);
-        }
-
-        return view('/corners/create', compact('trendingPosts'));
+        return view('/corners/create');
     }
 
     /**
@@ -80,29 +64,32 @@ class CornerController extends Controller
     public function show(String $handle)
     {
         $corner = Corner::where('handle', $handle)->firstOrFail();
-        $posts = Post::where('corner_id', $corner->id)->with('user', 'corner', 'comments', 'likes')->get();
+        $posts = Post::where('corner_id', $corner->id)->with('user', 'corner', 'comments', 'likes', 'views')->get();
 
         foreach ($posts as $post) {
             $post->liked = $post->likes->contains('user_id', Auth::id());
             $post->likesCount = count($post->likes);
             $post->commentsCount = count($post->comments);
+
+            if (Post::find($post->id)->views == null) {
+                Post::find($post->id)->views()->create();
+            }
+
+            Post::find($post->id)->views->increment('count');
+            $post->viewsCount = Post::find($post->id)->views->count;
         }
 
-        $owner = false;
+        $role = 'guest';
         $joined = false;
         if (Auth::check()) {
-            $user = User::where('id', Auth::user()->id)->first();
-            $owner = $user->createdCorners->contains($corner);
-            $joined = $user->corners->contains($corner->id);
+            $currentUser = User::where('id', Auth::user()->id)->first();
+            $joined = $currentUser->corners->find($corner) != null;
+            if ($joined) {
+                $role = $currentUser->corners->find($corner)->pivot->role;
+            }
         }
 
-        $trendingPosts = getTrendingPosts(3);
-        foreach ($trendingPosts as $post) {
-            $post->likesCount = count($post->likes);
-            $post->commentsCount = count($post->comments);
-        }
-
-        return view("corners.show", compact('corner', 'joined', 'owner', 'posts', 'trendingPosts'));
+        return view("corners.show", compact('corner', 'joined', 'role', 'posts'));
     }
 
     /**

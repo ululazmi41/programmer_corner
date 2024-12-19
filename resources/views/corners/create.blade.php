@@ -29,14 +29,14 @@
                 @csrf
                 <div>
                     <div id="bannerPlaceholder" class="w-full h-24 bg-gray-300 rounded-tl-lg rounded-t-lg"></div>
-                    <img src="/`img/dart.jpg" id="imgBanner" alt="banner" class="hidden w-full h-24 object-cover rounded-t-lg transition-all duration-300 ease-in-out" />
+                    <img src="" id="imgBanner" alt="banner" class="hidden w-full h-24 object-cover rounded-t-lg transition-all duration-300 ease-in-out" />
                 </div>
                 <div class="flex my-4 gap-4 items-center">
-                    <Image id="imgIcon" class="w-12 h-12" src="/img/group.png" alt="icon image" />
+                    <Image id="imgIcon" class="w-12 h-12 rounded-full" src="/img/group.png" alt="icon image" />
                     <div class="flex flex-col">
-                        <p class="font-semibold">Untitled</p>
-                        <p class="text-gray-500 text-sm">1 member • 1 online</p>
-                        <p class="text-sm">Description.</p>
+                        <p id="render-name" class="font-semibold">Untitled</p>
+                        <p class="text-gray-500 text-sm">1 member</p>
+                        <p id="render-message" class="text-sm">Description.</p>
                     </div>
                 </div>
 
@@ -71,11 +71,25 @@
                 </div>
 
                 <div class="h-4"></div>
-                <input class="{{ getClass('name', $errors) }} text-xs lg:text-md" name="name" id="name"
-                    type="text" placeholder="Name" value="{{ old('name') }}" />
+                <input
+                    onkeydown="alter('name')"
+                    onkeypress="alter('name')"
+                    onkeyup="alter('name')"
+                    class="{{ getClass('name', $errors) }} text-sm lg:text-base"
+                    id="name"
+                    name="name"
+                    type="text"
+                    placeholder="Name"
+                    value="{{ old('name') }}" />
                 <div class="h-4"></div>
-                <textarea id="message" rows="4" name="description"
-                    class="block p-2.5 w-full text-xs lg:text-md text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                <textarea
+                onkeydown="alter('message')"
+                onkeypress="alter('message')"
+                onkeyup="alter('message')"
+                    id="message"
+                    rows="4"
+                    name="description"
+                    class="block p-2.5 w-full text-sm lg:text-base text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Description"></textarea>
                 </textarea>
                 <div class="flex pt-4">
@@ -85,9 +99,24 @@
                 </div>
             </form>
         </div>
-        <x-right :$trendingPosts />
+        <x-trending />
     </div>
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            alter('name');
+            alter('message');
+        });
+
+        function alter(id) {
+            const render = document.querySelector(`#render-${id}`);
+            const input = document.querySelector(`#${id}`);
+            if (input.value != "") {
+                render.innerText = input.value;
+            } else {
+                render.innerText = "Untitle";
+            }
+        }
+
         function deleteBanner(type) {
             const gray = document.querySelector('#bannerPlaceholder');
             const img = document.querySelector(`#img${type}`);
@@ -137,7 +166,6 @@
         }
 
         function addImage(event, type) {
-            console.log(event, type);
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
