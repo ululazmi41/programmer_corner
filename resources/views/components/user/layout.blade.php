@@ -45,6 +45,14 @@
                         @endif
                     </div>
                 </a>
+                <a href="/users/{{ $user->username }}/bookmarks">
+                    <div class="flex flex-col">
+                        <p class="{{ getSubPage() == 'bookmarks' ? 'font-semibold' : 'text-gray-500 hover:text-gray-700' }}">Bookmarks</p>
+                        @if(getSubPage() == 'bookmarks')
+                            <div class="h-px bg-blue-500"></div>
+                        @endif
+                    </div>
+                </a>
             </div>
             {{ $slot }}
         </div>

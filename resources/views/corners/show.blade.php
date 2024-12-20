@@ -7,12 +7,13 @@
 @endphp
 
 <x-layout>
-    <div class="flex justify-between md:gap-8 pt-12 md:pt-16 mb-16">
+    <div class="flex justify-between md:gap-8 pt-12 md:pt-16">
         <x-left />
-        <div class="w-full md:w-3/5 mx-auto px-4 sm:px-0">
+        <div class="w-full md:w-3/5 mx-auto px-4 pt-2 lg:pt-0 sm:px-8 md:px-0 mb-8">
             <div>
                 <div id="bannerPlaceholder" class="{{ $corner["icon_url"] != "" ? "hidden" : "" }} w-full h-16 sm:h-24 bg-gray-300 rounded-tl-lg rounded-t-lg"></div>
-                <img src="{{ $corner["banner_url"] != "" ? asset("storage/banners/{$corner["banner_url"]}") : "" }}" id="imgBanner" alt="banner" class="{{ $corner["banner_url"] != "" ? "" : "hidden" }} w-full h-16 sm:h-24 object-cover rounded-t-lg transition-all duration-300 ease-in-out" />
+                <img src="{{ $corner["banner_url"] != "" ? asset("storage/banners/{$corner["banner_url"]}") : "" }}" id="imgBanner" alt="banner"
+                    class="{{ $corner["banner_url"] != "" ? "" : "hidden" }} w-full h-16 sm:h-24 object-cover rounded-t-lg transition-all duration-300 ease-in-out" />
             </div>
             <div class="mt-6 mx-auto">
                 <div class="flex flex-col gap-2 sm:gap-0 sm:flex-row justify-between items-start sm:items-center">
@@ -57,25 +58,35 @@
                 </div>
                 <p class="text-gray-500 text-xs sm:text-base mt-2 line-clamp-2">{{ $corner["description"] }}</p>
                 <div class="mt-2 h-px bg-gray-200"></div>
-                @foreach ($posts as $post)
-                    <x-card
-                        :$role
-                        :type="\App\Enums\ContentType::POST"
-                        :id="$post->id"
-                        :status="$post['status']"
-                        :corner="$post->corner->handle"
-                        author="{{ $post->user->username }}"
-                        authorId="{{ $post->user->id }}"
-                        date="{{ $post->created_at->format('j F Y') }}"
-                        imageUrl="{{ $post->user->image_url }}"
-                        title="{{ $post->title }}"
-                        description="{{ $post->content }}"
-                        likes="{{ $post->likesCount }}"
-                        views="{{ $post->viewsCount }}"
-                        comments="{{ $post->commentsCount }}"
-                        :liked="$post->liked"
-                        :bookmark="$post['bookmark']" />
-                @endforeach
+                @if (count($posts) > 0)
+                    @foreach ($posts as $post)
+                        <x-card
+                            :$role
+                            :type="\App\Enums\ContentType::POST"
+                            :id="$post->id"
+                            :status="$post['status']"
+                            :corner="$post->corner->handle"
+                            author="{{ $post->user->username }}"
+                            authorId="{{ $post->user->id }}"
+                            date="{{ $post->created_at->format('j F Y') }}"
+                            imageUrl="{{ $post->user->image_url }}"
+                            title="{{ $post->title }}"
+                            description="{{ $post->content }}"
+                            likes="{{ $post->likesCount }}"
+                            views="{{ $post->viewsCount }}"
+                            comments="{{ $post->commentsCount }}"
+                            :liked="$post->liked"
+                            :bookmark="$post['bookmark']" />
+                    @endforeach
+                @else
+                    <div class="grid px-4 w-5/6 m-auto md:w-full mt-12 lg:mt-16">
+                        <div class="grid m-auto text-center">
+                            <x-heroicon-c-chat-bubble-bottom-center-text class="m-auto auto w-8 h-8 md:w-16 md:h-16" />
+                            <h1 class="font-bold text-sm md:text-lg">There's no post created yet...</h1>
+                            <p class="text-xs md:text-md">Hmm... maybe check again after some time</p>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
         <x-trending />

@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Corner;
-use App\Models\Comment;
-use App\Models\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+
+use function App\Helpers\addCountsPost;
+use function App\Helpers\sortCommentsByLastActivity;
 
 class PostController extends Controller
 {
@@ -76,12 +76,6 @@ class PostController extends Controller
             return redirect()->back();
         }
 
-        if (Post::find($id)->views == null) {
-            Post::find($id)->views()->create();
-        }
-        
-        Post::find($id)->views->increment('count');
-
         $post = Post::where('id', $id)->with([
             'user',
             'views',
@@ -95,37 +89,8 @@ class PostController extends Controller
             'comments.replies.views',
         ])->firstOrFail();
 
-        $post->liked = $post->likes->contains('user_id', Auth::id());
-        $post->likesCount = count($post->likes);
-
-        foreach ($post->comments as $comment) {
-            $comment->likesCount = count($comment->likes);
-            $comment->liked = $comment->likes->contains('user_id', Auth::id());
-            $comment->lastActivity = $comment->updated_at;
-
-            if (Comment::find($comment->id)->views == null) {
-                Comment::find($comment->id)->views()->create();
-            }
-            
-            Comment::find($comment->id)->views->increment('count');
-            $comment->viewsCount = Comment::find($comment->id)->views->count;
-
-            foreach ($comment->replies as $reply) {
-                $reply->likesCount = count($reply->likes);
-                $reply->liked = $reply->likes->contains('user_id', Auth::id());
-
-                if ($reply->updated_at->timestamp > $comment->lastActivity->timestamp) {
-                    $comment->lastActivity = $reply->updated_at;
-                }
-
-                if (Comment::find($reply->id)->views == null) {
-                    Comment::find($reply->id)->views()->create();
-                }
-
-                Comment::find($reply->id)->views->increment('count');
-                $reply->viewsCount = Comment::find($reply->id)->views->count;
-            }
-        }
+        $postWithCount = addCountsPost($post, $withComments = true);
+        $sortedPost = sortCommentsByLastActivity($post);
 
         $post->comments = $post->comments->sortBy(function ($comment) {
             return -$comment->lastActivity->timestamp;

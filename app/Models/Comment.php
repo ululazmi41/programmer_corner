@@ -46,4 +46,9 @@ class Comment extends Model
     {
         return $this->morphOne(View::class, 'viewable');
     }
+
+    public function bookmarks(): MorphMany
+    {
+        return $this->morphMany(Bookmark::class, 'bookmarkable');
+    }
 }

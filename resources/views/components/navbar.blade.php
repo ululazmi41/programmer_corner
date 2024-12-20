@@ -15,7 +15,7 @@
 
             <p class="text-blue-500 text-xl font-bold cursor-default select-none">Pi</p>
         </div>
-        <form class="hidden sm:block w-2/6" action="search" method="GET">
+        <form class="hidden sm:block w-2/6" action="{{ route('search') }}" method="GET">
             <input
                 class="w-full text-gray-700 shadow appearance-none border rounded py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                 name="query" id="query" type="text" placeholder="Search" />

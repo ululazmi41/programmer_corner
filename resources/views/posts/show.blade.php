@@ -45,7 +45,7 @@
                     </div>
                 </div>
                 <p class="mt-2 text-md md:text-base font-bold">{{ $post->title }}</p>
-                <p class="mt-1 text-sm md:text-md">{{!! nl2br(e($post->content)) !!}}</p>
+                <p class="mt-1 text-sm md:text-md">{!! nl2br(e($post->content)) !!}</p>
                 <div class="flex justify-between mt-2">
                     <div class="flex gap-2 sm:gap-3">
                         <div id="dislike#{{ $post->id }}" onclick="toggleLike('{{ $post->id }}')"
@@ -71,11 +71,11 @@
                                     class="hidden sm:inline">views</span></p>
                         </div>
                     </div>
-                    <div id="bookmarked#{{ $post->id }}" onclick="toggleBookmark('{{ $post->id }}')"
+                    <div id="bookmarked#{{ $post->id }}" onclick="togglePostBookmark('{{ $post->id }}', {{ Auth::check() }})"
                         class="{{ $bookmark ?? false ? 'block' : 'hidden' }}">
                         <x-heroicon-s-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
                     </div>
-                    <div id="bookmarking#{{ $post->id }}" onclick="toggleBookmark('{{ $post->id }}')"
+                    <div id="bookmarking#{{ $post->id }}" onclick="togglePostBookmark('{{ $post->id }}', {{ Auth::check() }})"
                         class="{{ $bookmark ?? false ? 'hidden' : 'block' }}">
                         <x-heroicon-o-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
                     </div>
@@ -137,11 +137,31 @@
                 likeButton.classList.toggle("hidden");
                 likeButton.classList.toggle("block");
             }
-    
-            function toggleBookmark(image_url) {
-                const bookmarkingButton = document.getElementById(`bookmarking#${image_url}`);
-                const bookmarkedButton = document.getElementById(`bookmarked#${image_url}`);
-    
+
+            function sendPostBookmark(id) {
+                let formData = new FormData();
+                formData.append("type", 'post');
+                formData.append("id", id);
+
+                fetch('/bookmarks', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData,
+                });
+            }
+
+            function togglePostBookmark(id, loggedIn) {
+                if (!loggedIn) {
+                    return;
+                }
+                sendPostBookmark(id, loggedIn);
+
+                const bookmarkingButton = document.getElementById(`bookmarking#${id}`);
+                const bookmarkedButton = document.getElementById(`bookmarked#${id}`);
+
                 bookmarkedButton.classList.toggle("hidden");
                 bookmarkedButton.classList.toggle("block");
                 bookmarkingButton.classList.toggle("hidden");

@@ -95,11 +95,11 @@
                 @endif
             @endauth
         </div>
-        <div id="bookmarked#{{ $comment->id }}" onclick="toggleBookmark('{{ $comment->id }}')"
+        <div id="bookmarked#{{ $comment->id }}" onclick="toggleCommentBookmark('{{ $comment->id }}', '{{ Auth::check() }}')"
             class="{{ $bookmark ?? false ? 'block' : 'hidden' }}">
             <x-heroicon-s-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
         </div>
-        <div id="bookmarking#{{ $comment->id }}" onclick="toggleBookmark('{{ $comment->id }}')"
+        <div id="bookmarking#{{ $comment->id }}" onclick="toggleCommentBookmark('{{ $comment->id }}', '{{ Auth::check() }}')"
             class="{{ $bookmark ?? false ? 'hidden' : 'block' }}">
             <x-heroicon-o-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
         </div>
@@ -171,6 +171,36 @@
             dislikeButton.classList.toggle("block");
             likeButton.classList.toggle("hidden");
             likeButton.classList.toggle("block");
+        }
+
+        function sendCommentBookmark(id) {
+            let formData = new FormData();
+            formData.append("type", 'comment');
+            formData.append("id", id);
+
+            fetch('/bookmarks', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: formData,
+            });
+        }
+
+        function toggleCommentBookmark(id, loggedIn) {
+            if (!loggedIn) {
+                return;
+            }
+            sendCommentBookmark(id, loggedIn);
+
+            const bookmarkingButton = document.getElementById(`bookmarking#${id}`);
+            const bookmarkedButton = document.getElementById(`bookmarked#${id}`);
+
+            bookmarkedButton.classList.toggle("hidden");
+            bookmarkedButton.classList.toggle("block");
+            bookmarkingButton.classList.toggle("hidden");
+            bookmarkingButton.classList.toggle("block");
         }
     </script>
 </div>

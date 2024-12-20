@@ -61,19 +61,19 @@
             </a>
             <div class="flex justify-between mt-2">
                 <div class="flex gap-4 sm:gap-3">
-                    <div id="{{ $type }}-{{ $id }}-dislike" onclick="toggleLike('{{ $id }}', 'post', {{ Auth::check() }})"
+                    <div id="{{ $type }}-{{ $id }}-dislike" onclick="toggleLike('{{ $id }}', '{{ $type }}', {{ Auth::check() }})"
                         class="{{ $liked ? 'block' : 'hidden' }} text-red-500 hover:text-red-500 flex items-center gap-1 cursor-pointer">
                         <x-heroicon-s-heart class="w-4 h-4" />
                         <p class="text-xs sm:text-sm leading-tight">{{ intval($likes) + intval(!$liked) }} <span
                                 class="hidden sm:inline">likes</span></p>
                     </div>
-                    <div id="{{ $type }}-{{ $id }}-like" onclick="toggleLike('{{ $id }}', 'post', {{ Auth::check() }})"
+                    <div id="{{ $type }}-{{ $id }}-like" onclick="toggleLike('{{ $id }}', '{{ $type }}', {{ Auth::check() }})"
                         class="{{ $liked ? 'hidden' : 'block' }} text-gray-500 hover:text-gray-500 flex items-center gap-1 cursor-pointer">
                         <x-heroicon-o-heart class="w-4 h-4" />
                         <p class="text-xs sm:text-sm leading-tight">{{ intval($likes) - intval($liked) }} <span
                                 class="hidden sm:inline">likes</span></p>
                     </div>
-                    <div class="flex items-center gap-1 text-gray-500 hover:text-gray-700 cursor-pointer">
+                    <div class="flex items-center gap-1 text-gray-500 hover:text-gray-700">
                         <x-heroicon-o-chat-bubble-left-right class="w-4 h-4" />
                         <p class="text-xs sm:text-sm leading-tight">{{ $comments }} <span
                                 class="hidden sm:inline">comments</span></p>
@@ -110,11 +110,11 @@
                         @endif
                     @endauth
                 </div>
-                <div id="bookmarked#{{ $imageUrl }}" onclick="toggleBookmark('{{ $imageUrl }}')"
+                <div id="bookmarked#{{ $id }}" onclick="toggleBookmark('{{ $id }}', '{{ $type }}', {{ Auth::check() }})"
                     class="{{ $bookmark ? 'block' : 'hidden' }}">
                     <x-heroicon-s-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
                 </div>
-                <div id="bookmarking#{{ $imageUrl }}" onclick="toggleBookmark('{{ $imageUrl }}')"
+                <div id="bookmarking#{{ $id }}" onclick="toggleBookmark('{{ $id }}', '{{ $type }}', {{ Auth::check() }})"
                     class="{{ $bookmark ? 'hidden' : 'block' }}">
                     <x-heroicon-o-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
                 </div>
@@ -164,9 +164,29 @@
             likeButton.classList.toggle("block");
         }
 
-        function toggleBookmark(image_url) {
-            const bookmarkingButton = document.getElementById(`bookmarking#${image_url}`);
-            const bookmarkedButton = document.getElementById(`bookmarked#${image_url}`);
+        function sendBookmark(id, type) {
+            let formData = new FormData();
+            formData.append("type", type);
+            formData.append("id", id);
+
+            fetch('/bookmarks', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: formData,
+            });
+        }
+
+        function toggleBookmark(id, type, loggedIn) {
+            if (!loggedIn) {
+                return;
+            }
+            sendBookmark(id, type, loggedIn);
+
+            const bookmarkingButton = document.getElementById(`bookmarking#${id}`);
+            const bookmarkedButton = document.getElementById(`bookmarked#${id}`);
 
             bookmarkedButton.classList.toggle("hidden");
             bookmarkedButton.classList.toggle("block");

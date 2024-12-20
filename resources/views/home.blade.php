@@ -28,7 +28,7 @@
                             views="{{ $post->viewsCount }}"
                             comments="{{ $post->commentsCount }}"
                             :liked="$post->liked"
-                            :bookmark="$post['bookmark']" />
+                            :bookmark="$post->bookmarked" />
                     @endforeach
                 </div>
             @endif

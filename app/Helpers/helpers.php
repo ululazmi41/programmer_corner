@@ -2,7 +2,98 @@
 
 namespace App\Helpers;
 
+use App\Models\Comment;
 use App\Models\Post;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
+
+function addPostsBookmarks(Collection $posts): Collection {
+    foreach ($posts as $post) {
+        $post->bookmarked = $post->bookmarks->contains('user_id', Auth::id());
+    }
+    return $posts;
+}
+
+function sortPostsByPopularity(Collection $posts): Collection {
+    return $posts->sortByDesc(function ($post) {
+        return $post->likesCount + $post->commentsCount + $post->viewsCount;
+    });
+}
+
+function sortCommentsByLastActivity(Post &$post): Post {
+    foreach ($post->comments as $comment) {
+        $comment->lastActivity = $comment->updated_at;
+        
+        foreach ($comment->replies as $reply) {
+            if ($reply->updated_at->timestamp > $comment->lastActivity->timestamp) {
+                $comment->lastActivity = $reply->updated_at;
+            }
+        }
+    }
+
+    return $post;
+}
+
+function addCountsComment(Comment $comment): Comment {
+    $comment->likesCount = count($comment->likes);
+    $comment->liked = $comment->likes->contains('user_id', Auth::id());
+
+    if (Comment::find($comment->id)->views == null) {
+        Comment::find($comment->id)->views()->create();
+    }
+    
+    Comment::find($comment->id)->views->increment('count');
+    $comment->viewsCount = Comment::find($comment->id)->views->count;
+
+    foreach ($comment->replies as $reply) {
+        $reply->likesCount = count($reply->likes);
+        $reply->liked = $reply->likes->contains('user_id', Auth::id());
+
+        if (Comment::find($reply->id)->views == null) {
+            Comment::find($reply->id)->views()->create();
+        }
+
+        Comment::find($reply->id)->views->increment('count');
+        $reply->viewsCount = Comment::find($reply->id)->views->count;
+    }
+
+    return $comment;
+}
+
+function addCountsComments(Collection $comments): Collection {
+    return $comments->map(function (Comment $comment) {
+        return addCountsComment($comment);
+    });
+}
+
+function addCountsPost(Post $post, bool $withComments = false): Post {
+    $post->liked = false;
+    if (Auth::check()) {
+        $post->liked = $post->likes->contains('user_id', Auth::id());
+    }
+
+    $post->likesCount = count($post->likes);
+    $post->commentsCount = count($post->comments);
+
+    if (Post::find($post->id)->views == null) {
+        Post::find($post->id)->views()->create();
+    }
+
+    Post::find($post->id)->views->increment('count');
+    $post->viewsCount = Post::find($post->id)->views->count;
+
+    if ($withComments) {
+        $post->comments = addCountsComments($post->comments);
+    }
+
+    return $post;
+}
+
+function addCountsPosts(Collection $posts): Collection {
+    return $posts->map(function ($post) {
+        return addCountsPost($post);
+    });
+}
 
 function getTrendingPosts(int $limit) {
     $posts = Post::select('posts.*')

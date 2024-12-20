@@ -14,6 +14,23 @@
                 @else
                     @foreach ($posts as $post)
                         <x-card
+                            role="guest"
+                            :type="\App\Enums\ContentType::POST"
+                            :id="$post->id"
+                            :status="$post['status']"
+                            :corner="$post->corner->handle"
+                            author="{{ $post->user->username }}"
+                            authorId="{{ $post->user->id }}"
+                            date="{{ $post->created_at->format('j F Y') }}"
+                            imageUrl="{{ $post->user->image_url }}"
+                            :title="$post->title"
+                            :description="$post->content"
+                            :likes="$post->likesCount"
+                            :views="$post->viewsCount"
+                            :comments="$post->commentsCount"
+                            :liked="$post->liked"
+                            :bookmark="$post['bookmark']" />
+                        {{-- <x-card
                         author="{{ $post['author'] }}"
                         date="{{ $post['date'] }}"
                         imageUrl="{{ $post['imageUrl'] }}"
@@ -23,11 +40,11 @@
                         views="{{ $post['views'] }}"
                         comments="{{ $post['comments'] }}"
                         :liked="$post['liked']"
-                        :bookmark="$post['bookmark']" />
+                        :bookmark="$post['bookmark']" /> --}}
                     @endforeach
                 @endif
             </div>
         </div>
-        <x-right />
+        <x-trending />
     </div>
 </x-layout>

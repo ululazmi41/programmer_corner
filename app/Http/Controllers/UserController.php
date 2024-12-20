@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ContentType;
 use App\Enums\NotificationType;
 use App\Enums\UserOverview;
+use App\Models\Bookmark;
+use App\Models\Comment;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +16,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
+use function App\Helpers\addCountsComment;
+use function App\Helpers\addCountsComments;
+use function App\Helpers\addCountsPosts;
+use function App\Helpers\addPostsBookmarks;
 use function App\Helpers\getTrendingPosts;
 
 class UserController extends Controller
@@ -129,6 +137,44 @@ class UserController extends Controller
         ];
 
         return view('users.comments', compact('user', 'posts'));
+    }
+
+    public function bookmarks()
+    {
+        $unprocessedPost = Post::with('bookmarks', 'user', 'corner')->whereHas('bookmarks', function ($query) {
+            return $query->where('user_id', Auth::id());
+        })->get();
+
+        foreach ($unprocessedPost as $post) {
+            $post->type = ContentType::POST;
+        }
+
+        $addedCountsPosts = addCountsPosts($unprocessedPost);
+        $addedBookmarksPosts = addPostsBookmarks($addedCountsPosts);
+        $posts = $addedBookmarksPosts;
+
+        $unprocessedComments = Comment::with('bookmarks', 'post.corner', 'replies')->withCount('replies')->whereHas('bookmarks', function ($query) {
+            return $query->where('user_id', Auth::id());
+        })->get();
+
+        foreach ($unprocessedComments as $comment) {
+            $comment->type = ContentType::COMMENT;
+            $comment->corner = $comment->post->corner;
+        }
+
+        $addedCountsComments = addCountsComments($unprocessedComments);
+        $addedBookmarksComments = addPostsBookmarks($addedCountsComments);
+        $comments = $addedBookmarksComments;
+
+        $combined = $posts->merge($comments)->sortByDesc(function ($query) {
+            return $query->bookmarks()->first()->created_at;
+        });
+
+        $bookmarks = $combined;
+
+        $user = User::find(Auth::id());
+
+        return view('users.bookmarks', compact('user', 'bookmarks'));
     }
 
     public function notifications() {

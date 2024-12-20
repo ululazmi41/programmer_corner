@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use function App\Helpers\addCountsPosts;
+
 class CornerController extends Controller
 {
     /**
@@ -64,20 +66,8 @@ class CornerController extends Controller
     public function show(String $handle)
     {
         $corner = Corner::where('handle', $handle)->firstOrFail();
-        $posts = Post::where('corner_id', $corner->id)->with('user', 'corner', 'comments', 'likes', 'views')->get();
-
-        foreach ($posts as $post) {
-            $post->liked = $post->likes->contains('user_id', Auth::id());
-            $post->likesCount = count($post->likes);
-            $post->commentsCount = count($post->comments);
-
-            if (Post::find($post->id)->views == null) {
-                Post::find($post->id)->views()->create();
-            }
-
-            Post::find($post->id)->views->increment('count');
-            $post->viewsCount = Post::find($post->id)->views->count;
-        }
+        $posts = Post::where('corner_id', $corner->id)->with('user', 'corner', 'comments', 'likes', 'views')->latest()->get();
+        $posts = addCountsPosts($posts);
 
         $role = 'guest';
         $joined = false;
