@@ -7,11 +7,11 @@ use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
-function addPostsBookmarks(Collection $posts): Collection {
-    foreach ($posts as $post) {
-        $post->bookmarked = $post->bookmarks->contains('user_id', Auth::id());
+function addBookmarks(Collection $collections): Collection {
+    foreach ($collections as $collection) {
+        $collection->bookmarked = $collection->bookmarks->contains('user_id', Auth::id());
     }
-    return $posts;
+    return $collections;
 }
 
 function sortPostsByPopularity(Collection $posts): Collection {

@@ -32,7 +32,7 @@
                         </div>
                     </div>
                     <div class="my-4">
-                        <a href="{{ route('corners.show', ['id' => $post->corner->handle]) }}">
+                        <a href="{{ route('corners.show', ['handle' => $post->corner->handle]) }}">
                             <div class="flex py-1 px-2 rounded-md gap-2 items-center border bg-gray-100 hover:bg-gray-200 border-gray-300 w-max">
                                 <image
                                 class="w-2 h-2 md:w-4 md:h-4 rounded-full"
@@ -80,37 +80,49 @@
                         <x-heroicon-o-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
                     </div>
                 </div>
-                <x-form.comment :postId="$post->id" />
-                <div class="space-y-4">
+                <x-form.textarea name="body" id="comment-body" />
+                <div class="flex mt-2">
+                    <button onclick="sendComment('{{ $post->id }}', 'comment-body')" class="text-sm lg:text-base bg-blue-500 rounded-lg py-1 px-3 lg:px-4 text-white ml-auto" type="submit">
+                        Submit
+                    </button>
+                </div>
+                <div class="space-y-4" id="comments">
                     @foreach ($post->comments as $comment)
-                    <x-comment
-                        :$comment
-                        :$post
-                        replyId="comment#{{ $comment->id }}"
-                        loadingId="loading#{{ $comment->id }}" />
-                    <div id="loading#{{ $comment->id }}" class="hidden w-full">
-                        <svg class="mx-auto animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M4 12a8 8 0 0116 0" stroke="currentColor" stroke-width="4" fill="none"></path>
-                        </svg>
-                    </div>
-                    <div id="comment#{{ $comment->id }}" class="hidden">
-                        <div class="ml-8 space-y-4">
-                            @foreach ($comment->replies as $reply)
-                                <x-comment
-                                :$post
-                                :comment="$reply"
-                                :hideReply="true"
-                                />
-                            @endforeach
-                        </div>
-                        <x-form.comment :postId="$post->id" :parentId="$comment->id" />
-                    </div>
+                        <x-comment
+                            :$post
+                            :$comment
+                            replyId="comment#{{ $comment->id }}" />
                     @endforeach
                 </div>
             </div>
         </div>
 
         <script>
+            function sendComment(postId, id) {
+                const textarea = document.querySelector(`#${id}`);
+                const formData = new FormData();
+                formData.append("body", textarea.value);
+                formData.append("post_id", postId);
+                
+                textarea.value = "";
+
+                fetch('/comments', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const element = data.commentHtml;
+                    const commentsList = document.querySelector('#comments');
+                    commentsList.insertAdjacentHTML("afterbegin", element);
+                    textarea.value = "";
+                });
+            }
+
             function sendLike(postId) {
                 let formData = new FormData();
                 formData.append("type", 'post');

@@ -1,8 +1,7 @@
 @props([
-    'comment',
     'post',
+    'comment',
     'replyId' => null,
-    'loadingId' => null,
     'hideReply' => false,
 ])
 
@@ -45,7 +44,7 @@
                     <div
                         onclick="showReply(
                             '{{ $replyId }}',
-                            '{{ $loadingId }}',
+                            'loading#{{ $comment->id }}',
                             'commentIcon#{{ $comment->id }}#outline',
                             'commentIcon#{{ $comment->id }}#solid',
                         )"
@@ -104,6 +103,28 @@
             <x-heroicon-o-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
         </div>
     </div>
+    <div id="loading#{{ $comment->id }}" class="hidden w-full">
+        <svg class="mx-auto animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 12a8 8 0 0116 0" stroke="currentColor" stroke-width="4" fill="none"></path>
+        </svg>
+    </div>
+    <div id="comment#{{ $comment->id }}" class="hidden">
+        <div class="ml-4 md:ml-8 mt-4 space-y-4" id="comment-{{ $comment->id }}-replies">
+            @foreach ($comment->replies as $reply)
+                <x-comment
+                :$post
+                :comment="$reply"
+                :hideReply="true"
+                />
+            @endforeach
+        </div>
+        <x-form.textarea name="body" id="comment-{{ $comment->id }}-reply-body" />
+        <div class="flex mt-2">
+            <button onclick="sendReply('{{ $post->id }}', 'reply-body', '{{ $comment->id }}')" class="text-sm lg:text-base bg-blue-500 rounded-lg py-1 px-3 lg:px-4 text-white ml-auto" type="submit">
+                Submit
+            </button>
+        </div>
+    </div>
     <script>
         document.addEventListener('click', () => {
             const dropdownToggle = document.getElementById('comment-{{ $comment->id }}-dropdown-toggle');
@@ -115,6 +136,29 @@
                 }
             }
         });
+
+        function sendReply(postId, id, commentId) {
+            const textarea = document.querySelector(`#comment-${commentId}-reply-body`);
+            const formData = new FormData();
+            formData.append("body", textarea.value);
+            formData.append("post_id", postId);
+            formData.append("parent_id", commentId);
+            fetch('/comments', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                const element = data.commentHtml;
+                const RepliesList = document.querySelector(`#comment-${commentId}-replies`);
+                RepliesList.innerHTML += element;
+                textarea.value = "";
+            });
+        }
 
         function showLoading(loadingId) {
             const loading = document.getElementById(`${loadingId}`);

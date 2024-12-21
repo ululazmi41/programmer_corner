@@ -36,7 +36,7 @@ class LikeController extends Controller
             return response()->json([
                 'message' => 'Unauthorized',
             ], 401);
-        }
+            }
 
         if ($request->type == 'post') {
             $post = Post::where('id', intval($request->id))->first();

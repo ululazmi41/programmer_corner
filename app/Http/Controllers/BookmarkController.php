@@ -40,6 +40,7 @@ class BookmarkController extends Controller
         if ($request->type == 'post') {
             $post = Post::where('id', intval($request->id))->first();
             $exist = $post->bookmarks->contains('user_id', Auth::id());
+            
             if ($exist == false) {
                 Bookmark::create([
                     'user_id' => Auth::id(),
@@ -53,6 +54,7 @@ class BookmarkController extends Controller
         } else if ($request->type == 'comment') {
             $comment = Comment::where('id', intval($request->id))->first();
             $exist = $comment->bookmarks->contains('user_id', Auth::id());
+            
             if ($exist == false) {
                 Bookmark::create([
                     'user_id' => Auth::id(),

@@ -64,7 +64,7 @@ class PostController extends Controller
             'likes' => 0,
         ]);
 
-        return redirect()->route('corners.show', ['id' => $corner->handle]);
+        return redirect()->route('corners.show', ['handle' => $corner->handle]);
     }
 
     /**

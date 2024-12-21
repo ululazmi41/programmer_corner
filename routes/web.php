@@ -8,22 +8,19 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
-use App\Models\Bookmark;
 use App\Models\Comment;
 use App\Models\Post;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+use function App\Helpers\addBookmarks;
 use function App\Helpers\addCountsPosts;
-use function App\Helpers\addPostsBookmarks;
 use function App\Helpers\sortPostsByPopularity;
 
 Route::get('/', function () {
     $rawPosts = Post::all();
     $addedCounts = addCountsPosts($rawPosts);
-    $addedBookmarks = addPostsBookmarks($addedCounts);
+    $addedBookmarks = addBookmarks($addedCounts);
     $sorted = sortPostsByPopularity($addedBookmarks);
     $posts = $sorted;
 
@@ -31,8 +28,7 @@ Route::get('/', function () {
 });
 
 Route::get('/test', function () {
-    dd(Bookmark::all());
-    dd(User::where('id', Auth::id())->with('bookmarks')->first()->bookmarks);
+    dd(Post::find(33));
 });
 
 Route::controller(BookmarkController::class)->group(function () {
@@ -42,11 +38,13 @@ Route::controller(BookmarkController::class)->group(function () {
 
 Route::get('/search', function (Request $request) {
     $query = $request->input('query');
-    $posts = Post::where('title', 'like', '%' . $query . '%')
+    $initial = Post::where('title', 'like', '%' . $query . '%')
     ->orWhere('content', 'like', '%' . $query . '%')
     ->with(['likes', 'comments'])
     ->get();
-    $posts = addCountsPosts($posts);
+    $counted = addCountsPosts($initial);
+    $bookmarked = addBookmarks($counted);
+    $posts = $bookmarked;
 
     return view('search', compact('posts'));
 })->name('search');
@@ -73,7 +71,7 @@ Route::controller(PostController::class)->group(function () {
 
 Route::controller(CornerController::class)->group(function () {
     Route::get('/corners', 'index');
-    Route::get('/corners/{id}', 'show')->name('corners.show');
+    Route::get('/corners/{handle}', 'show')->name('corners.show');
     Route::get('/corners/{id}/join', 'join')->middleware('auth');
     Route::get('/corners/{id}/leave', 'leave')->middleware('auth');
 
@@ -82,11 +80,12 @@ Route::controller(CornerController::class)->group(function () {
 });
 
 Route::controller(UserController::class)->group(function () {
-    Route::prefix('users')->group(function () {
-        Route::get('{username}', 'show')->name('users.show');
-        Route::get('{username}/posts', 'posts')->name('user.posts');
-        Route::get('{username}/comments', 'comments')->name('user.comments');
-        Route::get('{username}/bookmarks', 'bookmarks')->middleware('auth')->name('user.bookmarks');
+    Route::prefix('users/{username}')->group(function () {
+        Route::get('/', 'show')->name('users.show');
+        Route::get('likes', 'likes')->name('user.likes');
+        Route::get('posts', 'posts')->name('user.posts');
+        Route::get('comments', 'comments')->name('user.comments');
+        Route::get('bookmarks', 'bookmarks')->middleware('auth')->name('user.bookmarks');
     });
 
     Route::prefix("settings")->group(function () {

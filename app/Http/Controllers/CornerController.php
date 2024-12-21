@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use function App\Helpers\addBookmarks;
 use function App\Helpers\addCountsPosts;
 
 class CornerController extends Controller
@@ -66,8 +67,10 @@ class CornerController extends Controller
     public function show(String $handle)
     {
         $corner = Corner::where('handle', $handle)->firstOrFail();
-        $posts = Post::where('corner_id', $corner->id)->with('user', 'corner', 'comments', 'likes', 'views')->latest()->get();
-        $posts = addCountsPosts($posts);
+        $unprocessed = Post::where('corner_id', $corner->id)->with('user', 'corner', 'comments', 'likes', 'views')->latest()->get();
+        $counted = addCountsPosts($unprocessed);
+        $bookmarks = addBookmarks($counted);
+        $posts = $bookmarks;
 
         $role = 'guest';
         $joined = false;
@@ -112,12 +115,12 @@ class CornerController extends Controller
         $corner = Corner::where('handle', $handle)->firstOrFail();
         
         if ($user->corners->contains($corner)) {
-            return redirect()->route('corners.show', ['id' => $handle]);
+            return redirect()->route('corners.show', ['handle' => $handle]);
         }
         
         $user->corners()->attach($corner);
 
-        return redirect()->route('corners.show', ['id' => $handle]);
+        return redirect()->route('corners.show', ['handle' => $handle]);
     }
 
     public function leave(String $handle)
@@ -126,11 +129,11 @@ class CornerController extends Controller
         $corner = Corner::where('handle', $handle)->firstOrFail();
         
         if (!$user->corners->contains($corner)) {
-            return redirect()->route('corners.show', ['id' => $handle]);
+            return redirect()->route('corners.show', ['handle' => $handle]);
         }
         
         $user->corners()->detach($corner);
 
-        return redirect()->route('corners.show', ['id' => $handle]);
+        return redirect()->route('corners.show', ['handle' => $handle]);
     }
 }

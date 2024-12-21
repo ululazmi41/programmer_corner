@@ -8,14 +8,19 @@
             </div>
         </div>
     @else
-        @foreach ($bookmarks as $bookmark)
+        <p class="my-2 px-2 py-1 w-max rounded-lg text-xs sm:text-sm lg:text-md border border-gray-500 bg-gray-200 text-gray-700">
+            Your bookmarks are private.
+        </p>
+        @foreach ($bookmarks as $index => $bookmark)
             @if ($bookmark->type == App\Enums\ContentType::POST)
                 <x-card
-                    :id="$bookmark->id"
+                    :id="$index"
+                    :postId="$bookmark->id"
                     :corner="$bookmark->corner->handle"
                     :type="$bookmark->type"
                     :author="$bookmark->user->name"
                     :authorId="$bookmark->user->id"
+                    :authorUsername="$bookmark->user->username"
                     :date="$bookmark->created_at->format('j F Y')"
                     :imageUrl="$bookmark->corner->icon_url"
                     :title="$bookmark->title"
@@ -27,11 +32,14 @@
                     :bookmark="true" />
             @elseif ($bookmark->type == App\Enums\ContentType::COMMENT)
                 <x-card
-                    :id="$bookmark->id"
+                    :id="$index"
+                    :postId="$bookmark->post_id"
+                    :commentId="$bookmark->id"
                     :corner="$bookmark->corner->handle"
                     :type="$bookmark->type"
                     :author="$bookmark->user->name"
                     :authorId="$bookmark->user->id"
+                    :authorUsername="$bookmark->user->username"
                     :date="$bookmark->created_at->format('j F Y')"
                     :imageUrl="$bookmark->user->image_url"
                     :title="$bookmark->post->title"

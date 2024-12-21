@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Enums\ContentType;
 use App\Enums\NotificationType;
 use App\Enums\UserOverview;
-use App\Models\Bookmark;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
@@ -16,11 +15,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
-use function App\Helpers\addCountsComment;
+use function App\Helpers\addBookmarks;
 use function App\Helpers\addCountsComments;
 use function App\Helpers\addCountsPosts;
-use function App\Helpers\addPostsBookmarks;
-use function App\Helpers\getTrendingPosts;
 
 class UserController extends Controller
 {
@@ -139,23 +136,47 @@ class UserController extends Controller
         return view('users.comments', compact('user', 'posts'));
     }
 
-    public function bookmarks()
+    public function likes()
     {
-        $unprocessedPost = Post::with('bookmarks', 'user', 'corner')->whereHas('bookmarks', function ($query) {
+        $postsQuery = Post::query();
+        $postsQuery->with([
+            'user',
+            'corner',
+            'bookmarks',
+            'likes' => function ($query) {
+                return $query->where('user_id', Auth::id());
+            },
+        ]);
+        $postsQuery->withCount('likes', 'comments');
+        $postsQuery->whereHas('likes', function ($query) {
             return $query->where('user_id', Auth::id());
         })->get();
+        $unprocessedPost = $postsQuery->get();
 
         foreach ($unprocessedPost as $post) {
             $post->type = ContentType::POST;
         }
 
         $addedCountsPosts = addCountsPosts($unprocessedPost);
-        $addedBookmarksPosts = addPostsBookmarks($addedCountsPosts);
+        $addedBookmarksPosts = addBookmarks($addedCountsPosts);
         $posts = $addedBookmarksPosts;
 
-        $unprocessedComments = Comment::with('bookmarks', 'post.corner', 'replies')->withCount('replies')->whereHas('bookmarks', function ($query) {
+        $commentsQuery = Comment::query();
+        
+        $commentsQuery->with([
+            'bookmarks',
+            'post.corner',
+            'replies',
+            'likes' => function ($query) {
+                return $query->where('user_id', Auth::id());
+            },
+        ]);
+        $commentsQuery->withCount('replies');
+        $commentsQuery->whereHas('likes', function ($query) {
             return $query->where('user_id', Auth::id());
-        })->get();
+        });
+
+        $unprocessedComments = $commentsQuery->get();
 
         foreach ($unprocessedComments as $comment) {
             $comment->type = ContentType::COMMENT;
@@ -163,9 +184,64 @@ class UserController extends Controller
         }
 
         $addedCountsComments = addCountsComments($unprocessedComments);
-        $addedBookmarksComments = addPostsBookmarks($addedCountsComments);
+        $addedBookmarksComments = addBookmarks($addedCountsComments);
         $comments = $addedBookmarksComments;
 
+        $combined = $posts->concat($comments)->sortByDesc(function ($query) {
+            return $query->likes->first()->created_at->timestamp;
+        });
+
+        $contents = $combined;
+
+        $user = User::find(Auth::id());
+
+        return view('users.likes', compact('user', 'contents'));
+    }
+
+    public function bookmarks()
+    {
+        $unprocessedPost = Post::with([
+                'user',
+                'corner',
+                'bookmarks' => function ($query) {
+                    return $query->where('user_id', Auth::id())->limit(1);
+                },
+            ])
+            ->withCount('likes', 'comments')
+            ->whereHas('bookmarks', function ($query) {
+                return $query->where('user_id', Auth::id());
+            })
+            ->get();
+
+        foreach ($unprocessedPost as $post) {
+            $post->type = ContentType::POST;
+        }
+
+        $addedCountsPosts = addCountsPosts($unprocessedPost);
+        $addedBookmarksPosts = addBookmarks($addedCountsPosts);
+        $posts = $addedBookmarksPosts;
+
+        $unprocessedComments = Comment::with([
+            'replies',
+            'post.corner',
+            'bookmarks' => function ($query) {
+                    return $query->where('user_id', Auth::id());
+                },
+            ])
+            ->withCount('replies', 'bookmarks')
+            ->whereHas('bookmarks', function ($query) {
+                return $query->where('user_id', Auth::id());
+            })->get();
+
+        foreach ($unprocessedComments as $comment) {
+            $comment->type = ContentType::COMMENT;
+            $comment->corner = $comment->post->corner;
+        }
+
+        $addedCountsComments = addCountsComments($unprocessedComments);
+        $addedBookmarksComments = addBookmarks($addedCountsComments);
+        $comments = $addedBookmarksComments;
+        
         $combined = $posts->merge($comments)->sortByDesc(function ($query) {
             return $query->bookmarks()->first()->created_at;
         });

@@ -14,9 +14,11 @@
                 <div class="flex flex-col mb-5">
                     @foreach ($posts as $post)
                         <x-card
-                            type="post"
+                            :type="\App\Enums\ContentType::POST"
                             :id="$post->id"
+                            :postId="$post->id"
                             :authorId="$post->user->id"
+                            :authorUsername="$post->user->username"
                             :status="$post['status']"
                             :corner="$post->corner->handle"
                             author="{{ $post->user->username }}"

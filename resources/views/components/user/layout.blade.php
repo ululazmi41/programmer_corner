@@ -20,39 +20,51 @@
             <p>{{ $user["description"] }}</p>
             <p class="text-sm text-gray-400">Joined {{ $user->created_at->format('j F Y') }}
             </p>
-            <div class="flex gap-4 mt-2">
-                <a href="/users/{{ $user->username }}">
+            <div class="flex overflow-x-auto no-scrollbar gap-4 mt-2">
+                <a class="flex-shrink-0" href="/users/{{ $user->username }}">
                     <div class="flex flex-col">
-                        <p class="{{ getSubPage() == '' ? 'font-semibold' : 'text-gray-500 hover:text-gray-700' }}">Overview</p>
+                        <p class="{{ getSubPage() == '' ? 'font-semibold' : 'text-gray-500' }} ' text-xs sm:text-md lg:text-base hover:text-gray-700' }}"">Overview</p>
                         @if(getSubPage() == '')
                             <div class="h-px bg-blue-500"></div>
                         @endif
                     </div>
                 </a>
-                <a href="/users/{{ $user->username }}/posts">
+                <a class="flex-shrink-0" href="/users/{{ $user->username }}/posts">
                     <div class="flex flex-col">
-                        <p class="{{ getSubPage() == 'posts' ? 'font-semibold' : 'text-gray-500 hover:text-gray-700' }}">Posts</p>
+                        <p class="{{ getSubPage() == 'posts' ? 'font-semibold' : 'text-gray-500' }} ' text-xs sm:text-md lg:text-base hover:text-gray-700' }}"">Posts</p>
                         @if(getSubPage() == 'posts')
                             <div class="h-px bg-blue-500"></div>
                         @endif
                     </div>
                 </a>
-                <a href="/users/{{ $user->username }}/comments">
+                <a class="flex-shrink-0" href="/users/{{ $user->username }}/comments">
                     <div class="flex flex-col">
-                        <p class="{{ getSubPage() == 'comments' ? 'font-semibold' : 'text-gray-500 hover:text-gray-700' }}">Comments</p>
+                        <p class="{{ getSubPage() == 'comments' ? 'font-semibold' : 'text-gray-500' }} ' text-xs sm:text-md lg:text-base hover:text-gray-700' }}"">Comments</p>
                         @if(getSubPage() == 'comments')
                             <div class="h-px bg-blue-500"></div>
                         @endif
                     </div>
                 </a>
-                <a href="/users/{{ $user->username }}/bookmarks">
+                <a class="flex-shrink-0" href="/users/{{ $user->username }}/likes">
                     <div class="flex flex-col">
-                        <p class="{{ getSubPage() == 'bookmarks' ? 'font-semibold' : 'text-gray-500 hover:text-gray-700' }}">Bookmarks</p>
-                        @if(getSubPage() == 'bookmarks')
+                        <p class="{{ getSubPage() == 'likes' ? 'font-semibold' : 'text-gray-500' }} ' text-xs sm:text-md lg:text-base hover:text-gray-700' }}"">Likes</p>
+                        @if(getSubPage() == 'likes')
                             <div class="h-px bg-blue-500"></div>
                         @endif
                     </div>
                 </a>
+                @auth
+                    @if ($user->id == Auth::id())
+                        <a class="flex-shrink-0" href="/users/{{ $user->username }}/bookmarks">
+                            <div class="flex flex-col">
+                                <p class="{{ getSubPage() == 'bookmarks' ? 'font-semibold' : 'text-gray-500' }} ' text-xs sm:text-md lg:text-base hover:text-gray-700' }}"">Bookmarks</p>
+                                @if(getSubPage() == 'bookmarks')
+                                <div class="h-px bg-blue-500"></div>
+                                @endif
+                            </div>
+                        </a>
+                    @endif
+                @endauth
             </div>
             {{ $slot }}
         </div>

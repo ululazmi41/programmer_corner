@@ -17,10 +17,12 @@
                             role="guest"
                             :type="\App\Enums\ContentType::POST"
                             :id="$post->id"
+                            :postId="$post->id"
                             :status="$post['status']"
                             :corner="$post->corner->handle"
                             author="{{ $post->user->username }}"
                             authorId="{{ $post->user->id }}"
+                            authorUsername="{{ $post->user->username }}"
                             date="{{ $post->created_at->format('j F Y') }}"
                             imageUrl="{{ $post->user->image_url }}"
                             :title="$post->title"
@@ -29,18 +31,7 @@
                             :views="$post->viewsCount"
                             :comments="$post->commentsCount"
                             :liked="$post->liked"
-                            :bookmark="$post['bookmark']" />
-                        {{-- <x-card
-                        author="{{ $post['author'] }}"
-                        date="{{ $post['date'] }}"
-                        imageUrl="{{ $post['imageUrl'] }}"
-                        title="{{ $post['title'] }}"
-                        description="{{ $post['description'] }}"
-                        likes="{{ $post['likes'] }}"
-                        views="{{ $post['views'] }}"
-                        comments="{{ $post['comments'] }}"
-                        :liked="$post['liked']"
-                        :bookmark="$post['bookmark']" /> --}}
+                            :bookmark="$post->bookmarked" />
                     @endforeach
                 @endif
             </div>

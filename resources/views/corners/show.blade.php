@@ -64,10 +64,11 @@
                             :$role
                             :type="\App\Enums\ContentType::POST"
                             :id="$post->id"
+                            :postId="$post->id"
                             :status="$post['status']"
-                            :corner="$post->corner->handle"
                             author="{{ $post->user->username }}"
                             authorId="{{ $post->user->id }}"
+                            :authorUsername="$post->user->username"
                             date="{{ $post->created_at->format('j F Y') }}"
                             imageUrl="{{ $post->user->image_url }}"
                             title="{{ $post->title }}"
@@ -76,7 +77,7 @@
                             views="{{ $post->viewsCount }}"
                             comments="{{ $post->commentsCount }}"
                             :liked="$post->liked"
-                            :bookmark="$post['bookmark']" />
+                            :bookmark="$post->bookmarked" />
                     @endforeach
                 @else
                     <div class="grid px-4 w-5/6 m-auto md:w-full mt-12 lg:mt-16">

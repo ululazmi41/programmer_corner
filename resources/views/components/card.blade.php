@@ -2,10 +2,13 @@
     'role' => null,
     'type' => null,
     'id',
-    'status' => null.
-    'corner',
+    'postId',
+    'commentId' => null,
+    'status' => null,
+    'corner' => null,
     'author',
     'authorId',
+    'authorUsername',
     'date',
     'imageUrl',
     'title',
@@ -18,6 +21,14 @@
 ])
 
 @php
+    $contentId = '';
+    if ($type == \App\Enums\ContentType::POST) {
+        $contentId = $postId;
+    } else if ($type == \App\Enums\ContentType::COMMENT) {
+        $contentId = $commentId;
+    } else {
+        $contentId = -1;
+    }
     $deleteAction = '';
     if ($type == \App\Enums\ContentType::POST) {
         $deleteAction = route('posts.destroy', ['id' => $id]);
@@ -37,9 +48,15 @@
         @endif
     @endif
     <div class="grid grid-cols-[max-content_1fr] gap-2 mt-1">
-        <a href="/communities" class="m-auto">
-            <Image class="my-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full" src="{{ $imageUrl ? asset("storage/icons/" . $imageUrl) : "/img/user.png" }}" alt="{{ $imageUrl ? $imageUrl : "image icon" }}" />
-        </a>
+        @if ($type == \App\Enums\ContentType::POST)
+            <a class="leading-3 self-end" href="/corners/{{ $corner }}" class="m-auto">
+                <Image class="my-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full" src="{{ $imageUrl ? asset("storage/icons/" . $imageUrl) : "/img/user.png" }}" alt="{{ $imageUrl ? $imageUrl : "image icon" }}" />
+            </a>
+        @elseif ($type === \App\Enums\ContentType::COMMENT)
+            <a class="leading-3 self-end" href="/username/{{ $authorUsername }}" class="m-auto">
+                <Image class="my-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full" src="{{ $imageUrl ? asset("storage/icons/" . $imageUrl) : "/img/user.png" }}" alt="{{ $imageUrl ? $imageUrl : "image icon" }}" />
+            </a>
+        @endif
         <div class="self-center">
             @if ($featured ?? false)
                 <div class="flex items-center gap-1">
@@ -47,27 +64,42 @@
                     <p class="text-xs leading-tight text-gray-900">featured</p>
                 </div>
             @endif
-            <a href="/posts/{{ $id ? $id : '' }}">
-                <div class="text-xs sm:text-md font-bold leading-tight line-clamp-2">{!! $title !!}</div>
+            @if ($corner)
+                <a
+                    class="text-gray-500 text-xs"
+                    href="{{ route('corners.show', ['handle' => $corner]) }}">
+                    ~{{ $corner }}
+                </a>
+            @endif
+            <a href="/posts/{{ $postId ? $postId : '' }}">
+                @if ($type == \App\Enums\ContentType::POST)
+                    <div class="text-xs sm:text-md font-bold leading-tight line-clamp-2">{!! $title !!}</div>
+                @elseif ($type === \App\Enums\ContentType::COMMENT)
+                    <div class="text-xs sm:text-md font-bold leading-tight line-clamp-2">{!! $author !!}</div>
+                @endif
             </a>
-            <div class="text-xs text-gray-400">{{ $author }} • {{ $date }}</div>
+            <div class="text-xs text-gray-400">
+                <a class="text hover:text-gray-700" href="{{ route('users.show', ['username' => $authorUsername]) }}">
+                    {{ $author }}
+                </a>
+                • {{ $date }}</div>
         </div>
         <div class="hidden sm:block"></div>
         <div class="col-span-2 sm:col-span-1">
-            <a href="/posts/{{ $id ? $id : '' }}">
+            <a href="/posts/{{ $postId ? $postId : '' }}">
                 <p class="leading-tight text-xs md:text-sm line-clamp-3">
                     {!! $description !!}
                 </p>
             </a>
             <div class="flex justify-between mt-2">
                 <div class="flex gap-4 sm:gap-3">
-                    <div id="{{ $type }}-{{ $id }}-dislike" onclick="toggleLike('{{ $id }}', '{{ $type }}', {{ Auth::check() }})"
+                    <div id="{{ $type }}-{{ $id }}-dislike" onclick="toggleLike('{{ $id }}', '{{ $contentId }}', '{{ $type }}', {{ Auth::check() }})"
                         class="{{ $liked ? 'block' : 'hidden' }} text-red-500 hover:text-red-500 flex items-center gap-1 cursor-pointer">
                         <x-heroicon-s-heart class="w-4 h-4" />
                         <p class="text-xs sm:text-sm leading-tight">{{ intval($likes) + intval(!$liked) }} <span
                                 class="hidden sm:inline">likes</span></p>
                     </div>
-                    <div id="{{ $type }}-{{ $id }}-like" onclick="toggleLike('{{ $id }}', '{{ $type }}', {{ Auth::check() }})"
+                    <div id="{{ $type }}-{{ $id }}-like" onclick="toggleLike('{{ $id }}', '{{ $contentId }}', '{{ $type }}', {{ Auth::check() }})"
                         class="{{ $liked ? 'hidden' : 'block' }} text-gray-500 hover:text-gray-500 flex items-center gap-1 cursor-pointer">
                         <x-heroicon-o-heart class="w-4 h-4" />
                         <p class="text-xs sm:text-sm leading-tight">{{ intval($likes) - intval($liked) }} <span
@@ -110,11 +142,11 @@
                         @endif
                     @endauth
                 </div>
-                <div id="bookmarked#{{ $id }}" onclick="toggleBookmark('{{ $id }}', '{{ $type }}', {{ Auth::check() }})"
+                <div id="bookmarked#{{ $id }}" onclick="toggleBookmark('{{ $id }}', '{{ $contentId }}', '{{ $type }}', {{ Auth::check() }})"
                     class="{{ $bookmark ? 'block' : 'hidden' }}">
                     <x-heroicon-s-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
                 </div>
-                <div id="bookmarking#{{ $id }}" onclick="toggleBookmark('{{ $id }}', '{{ $type }}', {{ Auth::check() }})"
+                <div id="bookmarking#{{ $id }}" onclick="toggleBookmark('{{ $id }}', '{{ $contentId }}', '{{ $type }}', {{ Auth::check() }})"
                     class="{{ $bookmark ? 'hidden' : 'block' }}">
                     <x-heroicon-o-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
                 </div>
@@ -147,14 +179,16 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: formData,
-            });
+            })
+            .then(response => response.json())
+            .then(data => console.log(data));
         }
 
-        function toggleLike(id, type, loggedIn) {
+        function toggleLike(id, likableId, type, loggedIn) {
             if (!loggedIn) {
                 return;
             }
-            sendLike(id, type);
+            sendLike(likableId, type);
             const likeButton = document.getElementById(`${type}-${id}-like`);
             const dislikeButton = document.getElementById(`${type}-${id}-dislike`);
 
@@ -176,14 +210,16 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: formData,
-            });
+            })
+            .then(response => response.json())
+            .then(data => console.log(data));
         }
 
-        function toggleBookmark(id, type, loggedIn) {
+        function toggleBookmark(id, contentId, type, loggedIn) {
             if (!loggedIn) {
                 return;
             }
-            sendBookmark(id, type, loggedIn);
+            sendBookmark(contentId, type, loggedIn);
 
             const bookmarkingButton = document.getElementById(`bookmarking#${id}`);
             const bookmarkedButton = document.getElementById(`bookmarked#${id}`);
