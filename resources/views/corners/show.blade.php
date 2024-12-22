@@ -11,15 +11,15 @@
         <x-left />
         <div class="w-full md:w-3/5 mx-auto px-4 pt-2 lg:pt-0 sm:px-8 md:px-0 mb-8">
             <div>
-                <div id="bannerPlaceholder" class="{{ $corner["icon_url"] != "" ? "hidden" : "" }} w-full h-16 sm:h-24 bg-gray-300 rounded-tl-lg rounded-t-lg"></div>
+                <div id="bannerPlaceholder" class="{{ $corner["banner_url"] != "" ? "hidden" : "" }} w-full h-16 sm:h-24 bg-gray-300 rounded-tl-lg rounded-t-lg"></div>
                 <img src="{{ $corner["banner_url"] != "" ? asset("storage/banners/{$corner["banner_url"]}") : "" }}" id="imgBanner" alt="banner"
                     class="{{ $corner["banner_url"] != "" ? "" : "hidden" }} w-full h-16 sm:h-24 object-cover rounded-t-lg transition-all duration-300 ease-in-out" />
             </div>
             <div class="mt-6 mx-auto">
                 <div class="flex flex-col gap-2 sm:gap-0 sm:flex-row justify-between items-start sm:items-center">
-                    <div class="flex items-center">
+                    <div class="flex items-center gap-2">
                         <img
-                            class="w-12 h-12 sm:w-16 sm:h-16"
+                            class="w-12 h-12 sm:w-16 sm:h-16 rounded-full"
                             src="{{ $corner["icon_url"] != "" ? asset("storage/icons/" . $corner["icon_url"]) : "/img/group.png" }}"
                             alt="{{ $corner["icon_url"] != "" ? $corner["icon_url"] : "group.png" }}">
                         <div>
@@ -56,7 +56,14 @@
                         @endif
                     </div>
                 </div>
-                <p class="text-gray-500 text-xs sm:text-base mt-2 line-clamp-2">{{ $corner["description"] }}</p>
+                <p class="text-gray-500 text-xs sm:text-base my-2 line-clamp-2">{{ $corner["description"] }}</p>
+                @if ($role === 'owner')
+                    <a href="{{ getSubPage() . '/settings' }}">
+                        <button class="text-xs sm:text-sm h-max text-white bg-blue-500 hover:bg-blue-700 rounded-lg py-1 px-3">
+                            Settings
+                        </button>
+                    </a>
+                @endif
                 <div class="mt-2 h-px bg-gray-200"></div>
                 @if (count($posts) > 0)
                     @foreach ($posts as $post)

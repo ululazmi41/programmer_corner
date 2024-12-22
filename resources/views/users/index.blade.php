@@ -1,5 +1,5 @@
 <x-user.layout :$user>
-    @if(empty($posts))
+    @if(count($contents) == 0)
         <div class="h-3/5 grid px-4 w-5/6 m-auto md:w-full">
             <div class="grid m-auto text-center">
                 <x-heroicon-s-chat-bubble-bottom-center-text class="m-auto auto w-8 h-8 md:w-16 md:h-16 text-gray-400" />
@@ -8,22 +8,45 @@
             </div>
         </div>
     @else
-        @foreach ($posts as $post)
-            <x-card-static
-                type="post"
-                id="1"
-                :status="$post['status']"
-                corner="1"
-                :author="$post['author']"
-                :date="Date::now()->format('j F Y')"
-                :imageUrl="$post['image_url']"
-                :title="$post['title']"
-                :description="$post['description']"
-                :likes="$post['likes']"
-                :views="rand(1,999)"
-                :comments="$post['comments']"
-                :liked="false"
-                :bookmark="$post['bookmark']" />
+        @foreach ($contents as $index => $content)
+            @if ($content->type == App\Enums\ContentType::POST)
+                <x-card
+                    :id="$index"
+                    :postId="$content->id"
+                    :corner="$content->corner->handle"
+                    :type="$content->type"
+                    :author="$content->user->name"
+                    :authorId="$content->user->id"
+                    :authorUsername="$content->user->username"
+                    :date="$content->updated_at->format('j F Y')"
+                    :imageUrl="$content->corner->icon_url"
+                    :title="$content->title"
+                    :description="$content->content"
+                    :likes="$content->likesCount"
+                    :views="$content->viewsCount"
+                    :comments="$content->commentsCount"
+                    :liked="$content->liked"
+                    :bookmark="$content->bookmarked" />
+            @elseif ($content->type == App\Enums\ContentType::COMMENT)
+                <x-card
+                    :id="$index"
+                    :postId="$content->post_id"
+                    :commentId="$content->id"
+                    :corner="$content->corner->handle"
+                    :type="$content->type"
+                    :author="$content->user->name"
+                    :authorId="$content->user->id"
+                    :authorUsername="$content->user->username"
+                    :date="$content->updated_at->format('j F Y')"
+                    :imageUrl="$content->user->image_url"
+                    :title="$content->post->title"
+                    :description="$content->body"
+                    :likes="$content->likesCount"
+                    :views="$content->viewsCount"
+                    :comments="$content->replies_count"
+                    :liked="$content->liked"
+                    :bookmark="$content->bookmarked" />
+            @endif
         @endforeach
     @endif
 </x-user.layout>

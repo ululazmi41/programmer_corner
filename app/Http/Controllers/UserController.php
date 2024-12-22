@@ -17,139 +17,131 @@ use Illuminate\Validation\Rules\Password;
 
 use function App\Helpers\addBookmarks;
 use function App\Helpers\addCountsComments;
+use function App\Helpers\addCountsPost;
 use function App\Helpers\addCountsPosts;
 
 class UserController extends Controller
 {
     public function show(String $username)
     {
-        $user = User::where('username', $username)->first();
+        $user = User::where('username', $username)->firstOrFail();
 
-        $posts = [
-            [
-                "id" => "1",
-                "status" => UserOverview::POST,
-                "author" => "Python",
-                "date" => "1/12/2024",
-                "image_url" => "python.png",
-                "title" => "What's the cheapest way to host a python script?",
-                "description" => "Hello, I have a Python script that I need to run every minute. I came across PythonAnywhere, which costs about $5 per month for the first Tier Account. Are there any cheaper alternatives to keep my script running? Would it be more cost-effective to run the script continuously by leaving my computer on? I’m new to this, so any advice or suggestions would be greatly appreciated. Thank you! ",
-                "likes" => "13",
-                "comments" => "21",
-                "views" => "1.2K",
-                "liked" => "true",
-                "featured" => "true",
-                "bookmark" => true,
-            ],
-            [
-                "id" => "2",
-                "status" => UserOverview::COMMENT,
-                "author" => "Golang",
-                "date" => "3/12/2024",
-                "image_url" => "go.png",
-                "title" => "Advent of Code 2024 Day 1: Missing abs() for integers",
-                "description" => "Wrote a blog about this year's advent of code day 1. While solving the problem I was once again struck with the missing function for calculating absolute value for integers and decided to dig a lil deeper. You'll also find a small recap of how the abs() function for floats evolved over time in the standard library. ",
-                "likes" => "7",
-                "comments" => "3",
-                "views" => "419",
-                "liked" => "false",
-                "featured" => "false",
-                "bookmark" => false,
-            ],
-            [
-                "id" => "3",
-                "status" => UserOverview::POST,
-                "author" => "Rust",
-                "date" => "26/11/2024",
-                "image_url" => "rust.png",
-                "title" => "Anyone actually using io_uring with rust in production? What's the experience like?",
-                "description" => "I have a long running program that ingests a lot of data and then pushes them to subscribed listeners. Recently the amount of data for ingesting has increased and I am facing a bottleneck while parsing the data. I am rethinking the architecture and want to try io_uring. So what has been your experience with it in rust? Has there been any downside to using runtimes like glommio or tokio_uring?",
-                "likes" => "31",
-                "comments" => "7",
-                "views" => "122",
-                "liked" => "false",
-                "featured" => "false",
-                "bookmark" => true,
-            ],
-        ];
+        $Postsquery = Post::query();
+        $Postsquery->where('user_id', $user->id);
+        $Postsquery->with([
+            'user',
+            'likes',
+            'corner',
+            'comments',
+            'bookmarks',
+        ]);
+        $initialPosts = $Postsquery->get();
 
-        return view('users.index', compact('user', 'posts'));
+        foreach ($initialPosts as $post) {
+            $post->type = ContentType::POST;
+        }
+
+        $countedPosts = addCountsPosts($initialPosts, $withReply=false);
+        $bookmarkedPosts = addBookmarks($countedPosts);
+
+        $commentsQuery = Comment::query();
+        $commentsQuery->where('user_id', $user->id);
+        $commentsQuery->with([
+            'likes',
+            'replies',
+            'bookmarks',
+            'post.corner',
+        ]);
+        $commentsQuery->withCount('replies');
+        $initialComments = $commentsQuery->get();
+
+        foreach ($initialComments as $comment) {
+            $comment->type = ContentType::COMMENT;
+            $comment->corner = $comment->post->corner;
+        }
+
+        $countedComents = addCountsComments($initialComments, $withReply=false);
+        $bookmarkedComments = addBookmarks($countedComents);
+
+        $sorted = $bookmarkedPosts->merge($bookmarkedComments)->sortByDesc(function ($query) {
+            return $query->updated_at->timestamp;
+        });
+
+        $contents = $sorted;
+
+        return view('users.index', compact('user', 'contents'));
     }
 
     public function posts(String $username)
     {
-        $user = User::where('username', $username)->first();
-        
-        $posts = [
-            [
-                "author" => "Python",
-                "date" => "1/12/2024",
-                "image_url" => "python.png",
-                "title" => "What's the cheapest way to host a python script?",
-                "description" => "Hello, I have a Python script that I need to run every minute. I came across PythonAnywhere, which costs about $5 per month for the first Tier Account. Are there any cheaper alternatives to keep my script running? Would it be more cost-effective to run the script continuously by leaving my computer on? I’m new to this, so any advice or suggestions would be greatly appreciated. Thank you! ",
-                "likes" => "13",
-                "comments" => "21",
-                "views" => "1.2K",
-                "liked" => "true",
-                "featured" => "true",
-                "bookmark" => "true",
-            ],
-            [
-                "author" => "Rust",
-                "date" => "26/11/2024",
-                "image_url" => "rust.png",
-                "title" => "Anyone actually using io_uring with rust in production? What's the experience like?",
-                "description" => "I have a long running program that ingests a lot of data and then pushes them to subscribed listeners. Recently the amount of data for ingesting has increased and I am facing a bottleneck while parsing the data. I am rethinking the architecture and want to try io_uring. So what has been your experience with it in rust? Has there been any downside to using runtimes like glommio or tokio_uring?",
-                "likes" => "31",
-                "comments" => "7",
-                "views" => "122",
-                "liked" => "false",
-                "featured" => "false",
-                "bookmark" => "true",
-            ],
-        ];
-    
+        $user = User::where('username', $username)->firstOrFail();
+
+        $query = Post::query();
+        $query->where('user_id', $user->id);
+        $query->with([
+            'user',
+            'likes',
+            'corner',
+            'comments',
+            'bookmarks',
+        ]);
+        $initial = $query->get();
+        $counted = addCountsPosts($initial, $withReply=false);
+        $bookmarked = addBookmarks($counted);
+        $sorted = $bookmarked->sortByDesc(function ($query) {
+            return $query->updated_at->timestamp;
+        });
+        $posts = $sorted;
+
         return view('users.posts', compact('user', 'posts'));
     }
 
     public function comments(String $username)
     {
-        $user = User::where('username', $username)->first();
-        
-        $posts = [
-            [
-                "id" => "1",
-                "author" => "Golang",
-                "date" => "3/12/2024",
-                "image_url" => "go.png",
-                "title" => "Advent of Code 2024 Day 1: Missing abs() for integers",
-                "description" => "Wrote a blog about this year's advent of code day 1. While solving the problem I was once again struck with the missing function for calculating absolute value for integers and decided to dig a lil deeper. You'll also find a small recap of how the abs() function for floats evolved over time in the standard library. ",
-                "likes" => "7",
-                "comments" => "3",
-                "views" => "419",
-                "liked" => "false",
-                "featured" => "false",
-                "bookmark" => "false",
-            ],
-        ];
+        $user = User::where('username', $username)->firstOrFail();
 
-        return view('users.comments', compact('user', 'posts'));
+        $query = Comment::query();
+        $query->where('user_id', $user->id);
+        $query->with([
+            'likes',
+            'replies',
+            'bookmarks',
+            'post.corner',
+        ]);
+        $query->withCount('replies');
+        $initial = $query->get();
+
+        foreach ($initial as $comment) {
+            $comment->type = ContentType::COMMENT;
+            $comment->corner = $comment->post->corner;
+        }
+
+        $counted = addCountsComments($initial, $withReply=false);
+        $bookmarked = addBookmarks($counted);
+        $sorted = $bookmarked->sortByDesc(function ($query) {
+            return $query->updated_at->timestamp;
+        });
+        $comments = $sorted;
+
+        return view('users.comments', compact('user', 'comments'));
     }
 
-    public function likes()
+    public function likes(String $username)
     {
+        $user = User::where('username', $username)->first();
+
         $postsQuery = Post::query();
         $postsQuery->with([
             'user',
             'corner',
             'bookmarks',
-            'likes' => function ($query) {
-                return $query->where('user_id', Auth::id());
+            'likes' => function ($query) use($user) {
+                return $query->where('user_id', $user->id);
             },
         ]);
         $postsQuery->withCount('likes', 'comments');
-        $postsQuery->whereHas('likes', function ($query) {
-            return $query->where('user_id', Auth::id());
+        $postsQuery->whereHas('likes', function ($query) use($user) {
+            return $query->where('user_id', $user->id);
         })->get();
         $unprocessedPost = $postsQuery->get();
 
@@ -167,13 +159,13 @@ class UserController extends Controller
             'bookmarks',
             'post.corner',
             'replies',
-            'likes' => function ($query) {
-                return $query->where('user_id', Auth::id());
+            'likes' => function ($query) use($user) {
+                return $query->where('user_id', $user->id);
             },
         ]);
         $commentsQuery->withCount('replies');
-        $commentsQuery->whereHas('likes', function ($query) {
-            return $query->where('user_id', Auth::id());
+        $commentsQuery->whereHas('likes', function ($query) use($user) {
+            return $query->where('user_id', $user->id);
         });
 
         $unprocessedComments = $commentsQuery->get();
@@ -193,23 +185,23 @@ class UserController extends Controller
 
         $contents = $combined;
 
-        $user = User::find(Auth::id());
-
         return view('users.likes', compact('user', 'contents'));
     }
 
-    public function bookmarks()
+    public function bookmarks(String $username)
     {
+        $user = User::where('username', $username)->first();
+
         $unprocessedPost = Post::with([
                 'user',
                 'corner',
-                'bookmarks' => function ($query) {
-                    return $query->where('user_id', Auth::id())->limit(1);
+                'bookmarks' => function ($query) use ($user) {
+                    return $query->where('user_id', $user->id)->limit(1);
                 },
             ])
             ->withCount('likes', 'comments')
-            ->whereHas('bookmarks', function ($query) {
-                return $query->where('user_id', Auth::id());
+            ->whereHas('bookmarks', function ($query) use ($user) {
+                return $query->where('user_id', $user->id);
             })
             ->get();
 
@@ -224,13 +216,13 @@ class UserController extends Controller
         $unprocessedComments = Comment::with([
             'replies',
             'post.corner',
-            'bookmarks' => function ($query) {
-                    return $query->where('user_id', Auth::id());
+            'bookmarks' => function ($query) use ($user) {
+                    return $query->where('user_id', $user->id);
                 },
             ])
             ->withCount('replies', 'bookmarks')
-            ->whereHas('bookmarks', function ($query) {
-                return $query->where('user_id', Auth::id());
+            ->whereHas('bookmarks', function ($query) use ($user) {
+                return $query->where('user_id', $user->id);
             })->get();
 
         foreach ($unprocessedComments as $comment) {
@@ -247,8 +239,6 @@ class UserController extends Controller
         });
 
         $bookmarks = $combined;
-
-        $user = User::find(Auth::id());
 
         return view('users.bookmarks', compact('user', 'bookmarks'));
     }
@@ -431,5 +421,13 @@ class UserController extends Controller
                 "type" => $request->type,
             ], 422);
         }
+    }
+
+    public function destroy(User $user) {
+        $user->delete();
+
+        Auth::logout();
+
+        return redirect('/');
     }
 }

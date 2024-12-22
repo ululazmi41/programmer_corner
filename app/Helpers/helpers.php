@@ -34,7 +34,7 @@ function sortCommentsByLastActivity(Post &$post): Post {
     return $post;
 }
 
-function addCountsComment(Comment $comment): Comment {
+function addCountsComment(Comment $comment, bool $withReply = true): Comment {
     $comment->likesCount = count($comment->likes);
     $comment->liked = $comment->likes->contains('user_id', Auth::id());
 
@@ -45,24 +45,26 @@ function addCountsComment(Comment $comment): Comment {
     Comment::find($comment->id)->views->increment('count');
     $comment->viewsCount = Comment::find($comment->id)->views->count;
 
-    foreach ($comment->replies as $reply) {
-        $reply->likesCount = count($reply->likes);
-        $reply->liked = $reply->likes->contains('user_id', Auth::id());
-
-        if (Comment::find($reply->id)->views == null) {
-            Comment::find($reply->id)->views()->create();
+    if ($withReply) {
+        foreach ($comment->replies as $reply) {
+            $reply->likesCount = count($reply->likes);
+            $reply->liked = $reply->likes->contains('user_id', Auth::id());
+    
+            if (Comment::find($reply->id)->views == null) {
+                Comment::find($reply->id)->views()->create();
+            }
+    
+            Comment::find($reply->id)->views->increment('count');
+            $reply->viewsCount = Comment::find($reply->id)->views->count;
         }
-
-        Comment::find($reply->id)->views->increment('count');
-        $reply->viewsCount = Comment::find($reply->id)->views->count;
     }
 
     return $comment;
 }
 
-function addCountsComments(Collection $comments): Collection {
-    return $comments->map(function (Comment $comment) {
-        return addCountsComment($comment);
+function addCountsComments(Collection $comments, bool $withReply = true): Collection {
+    return $comments->map(function (Comment $comment) use($withReply) {
+        return addCountsComment($comment, $withReply);
     });
 }
 
@@ -89,9 +91,9 @@ function addCountsPost(Post $post, bool $withComments = false): Post {
     return $post;
 }
 
-function addCountsPosts(Collection $posts): Collection {
-    return $posts->map(function ($post) {
-        return addCountsPost($post);
+function addCountsPosts(Collection $posts, $withReply=false): Collection {
+    return $posts->map(function ($post) use ($withReply) {
+        return addCountsPost($post, $withReply=$withReply);
     });
 }
 

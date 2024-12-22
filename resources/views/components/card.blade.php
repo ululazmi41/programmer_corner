@@ -48,15 +48,9 @@
         @endif
     @endif
     <div class="grid grid-cols-[max-content_1fr] gap-2 mt-1">
-        @if ($type == \App\Enums\ContentType::POST)
-            <a class="leading-3 self-end" href="/corners/{{ $corner }}" class="m-auto">
-                <Image class="my-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full" src="{{ $imageUrl ? asset("storage/icons/" . $imageUrl) : "/img/user.png" }}" alt="{{ $imageUrl ? $imageUrl : "image icon" }}" />
-            </a>
-        @elseif ($type === \App\Enums\ContentType::COMMENT)
-            <a class="leading-3 self-end" href="/username/{{ $authorUsername }}" class="m-auto">
-                <Image class="my-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full" src="{{ $imageUrl ? asset("storage/icons/" . $imageUrl) : "/img/user.png" }}" alt="{{ $imageUrl ? $imageUrl : "image icon" }}" />
-            </a>
-        @endif
+        <a class="leading-3 self-end" href="{{ route('users.show', ['username' => $authorUsername]) }}" class="m-auto">
+            <Image class="my-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full" src="{{ $imageUrl ? asset("storage/icons/" . $imageUrl) : "/img/user.png" }}" alt="{{ $imageUrl ? $imageUrl : "image icon" }}" />
+        </a>
         <div class="self-center">
             @if ($featured ?? false)
                 <div class="flex items-center gap-1">
@@ -93,18 +87,32 @@
             </a>
             <div class="flex justify-between mt-2">
                 <div class="flex gap-4 sm:gap-3">
-                    <div id="{{ $type }}-{{ $id }}-dislike" onclick="toggleLike('{{ $id }}', '{{ $contentId }}', '{{ $type }}', {{ Auth::check() }})"
-                        class="{{ $liked ? 'block' : 'hidden' }} text-red-500 hover:text-red-500 flex items-center gap-1 cursor-pointer">
-                        <x-heroicon-s-heart class="w-4 h-4" />
-                        <p class="text-xs sm:text-sm leading-tight">{{ intval($likes) + intval(!$liked) }} <span
-                                class="hidden sm:inline">likes</span></p>
-                    </div>
-                    <div id="{{ $type }}-{{ $id }}-like" onclick="toggleLike('{{ $id }}', '{{ $contentId }}', '{{ $type }}', {{ Auth::check() }})"
-                        class="{{ $liked ? 'hidden' : 'block' }} text-gray-500 hover:text-gray-500 flex items-center gap-1 cursor-pointer">
-                        <x-heroicon-o-heart class="w-4 h-4" />
-                        <p class="text-xs sm:text-sm leading-tight">{{ intval($likes) - intval($liked) }} <span
-                                class="hidden sm:inline">likes</span></p>
-                    </div>
+                    @auth
+                        <div id="{{ $type }}-{{ $id }}-dislike" onclick="toggleLike('{{ $id }}', '{{ $contentId }}', '{{ $type }}', {{ Auth::check() }})"
+                            class="{{ $liked ? 'block' : 'hidden' }} text-red-500 hover:text-red-500 flex items-center gap-1 cursor-pointer">
+                            <x-heroicon-s-heart class="w-4 h-4" />
+                            <p class="text-xs sm:text-sm leading-tight">{{ intval($likes) + intval(!$liked) }} 
+                                <span class="hidden sm:inline">likes</span
+                            ></p>
+                        </div>
+                        <div id="{{ $type }}-{{ $id }}-like" onclick="toggleLike('{{ $id }}', '{{ $contentId }}', '{{ $type }}', {{ Auth::check() }})"
+                            class="{{ $liked ? 'hidden' : 'block' }} text-gray-500 hover:text-gray-500 flex items-center gap-1 cursor-pointer">
+                            <x-heroicon-o-heart class="w-4 h-4" />
+                            <p class="text-xs sm:text-sm leading-tight">{{ intval($likes) - intval($liked) }}
+                                <span class="hidden sm:inline">likes</span>
+                            </p>
+                        </div>
+                    @endauth
+                    @guest
+                        <a href="{{ route('login') }}">
+                            <div class="text-gray-500 hover:text-gray-500 flex items-center gap-1 cursor-pointer">
+                                <x-heroicon-o-heart class="w-4 h-4" />
+                                <p class="text-xs sm:text-sm leading-tight">{{ intval($likes) - intval($liked) }}
+                                    <span class="hidden sm:inline">likes</span>
+                                </p>
+                            </div>
+                        </a>
+                    @endguest
                     <div class="flex items-center gap-1 text-gray-500 hover:text-gray-700">
                         <x-heroicon-o-chat-bubble-left-right class="w-4 h-4" />
                         <p class="text-xs sm:text-sm leading-tight">{{ $comments }} <span

@@ -70,6 +70,7 @@
                             <p class="text-xs sm:text-sm leading-tight">{{ $post->views->count }} <span
                                     class="hidden sm:inline">views</span></p>
                         </div>
+                        <x-post.menu :content="$post" :type="\App\Enums\ContentType::POST" />
                     </div>
                     <div id="bookmarked#{{ $post->id }}" onclick="togglePostBookmark('{{ $post->id }}', {{ Auth::check() }})"
                         class="{{ $bookmark ?? false ? 'block' : 'hidden' }}">

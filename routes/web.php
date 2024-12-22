@@ -11,6 +11,7 @@ use App\Http\Controllers\UserController;
 use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 use function App\Helpers\addBookmarks;
@@ -28,7 +29,7 @@ Route::get('/', function () {
 });
 
 Route::get('/test', function () {
-    dd(Post::find(33));
+    dd(1);
 });
 
 Route::controller(BookmarkController::class)->group(function () {
@@ -65,26 +66,40 @@ Route::controller(CommentController::class)->group(function () {
 Route::controller(PostController::class)->group(function () {
     Route::get('/corners/{id}/create-post', 'create')->middleware('auth');
     Route::get('/posts/{id}', 'show')->name('posts.show');
-    Route::post('/posts', 'store')->name('post.post')->middleware('auth');
+    Route::get('/posts/{post}/edit', 'edit')->name('posts.edit');
+    Route::put('/posts/{post}', 'update')->middleware('auth')->name('posts.update');
+    Route::post('/posts', 'store')->middleware('auth')->name('post.post');
     Route::delete('/posts/{id}', 'destroy')->middleware('auth')->name('posts.destroy');
 });
 
 Route::controller(CornerController::class)->group(function () {
-    Route::get('/corners', 'index');
+    Route::get('/corners', 'index')->name('corners.index');
     Route::get('/corners/{handle}', 'show')->name('corners.show');
     Route::get('/corners/{id}/join', 'join')->middleware('auth');
     Route::get('/corners/{id}/leave', 'leave')->middleware('auth');
+    Route::put('/corners/{id}', 'update')->middleware('auth');
+
+    Route::get('/corners/{handle}/settings', 'settings')->middleware('auth');
+
+    Route::post('/corners/{id}/settings/icon', 'setIcon')->middleware('auth');
+    Route::delete('/corners/{id}/settings/icon', 'deleteIcon')->middleware('auth');
+
+    Route::post('/corners/{id}/settings/banner', 'setBanner')->middleware('auth');
+    Route::delete('/corners/{id}/settings/banner', 'deleteBanner')->middleware('auth');
 
     Route::get('/create-corner', 'create')->middleware('auth');
     Route::post('/create-corner', 'store')->middleware('auth');
+
+    Route::delete('/corners/{corner}', 'destroy')->middleware('auth')->name('corners.destroy');
 });
 
 Route::controller(UserController::class)->group(function () {
     Route::prefix('users/{username}')->group(function () {
         Route::get('/', 'show')->name('users.show');
-        Route::get('likes', 'likes')->name('user.likes');
         Route::get('posts', 'posts')->name('user.posts');
         Route::get('comments', 'comments')->name('user.comments');
+
+        Route::get('likes', 'likes')->middleware('auth')->name('user.likes');
         Route::get('bookmarks', 'bookmarks')->middleware('auth')->name('user.bookmarks');
     });
 
@@ -95,6 +110,7 @@ Route::controller(UserController::class)->group(function () {
         Route::delete('icon', 'deleteIcon');
     });
 
+    Route::delete('/users/{user}', 'destroy')->middleware('auth')->name('users.destroy');
     Route::get('/notifications', 'notifications')->middleware('auth');
 });
 

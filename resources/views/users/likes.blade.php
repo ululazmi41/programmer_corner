@@ -1,5 +1,5 @@
 <x-user.layout :$user>
-    @if(empty($contents))
+    @if(count($contents) == 0)
         <div class="h-3/5 grid px-4 w-5/6 m-auto md:w-full">
             <div class="grid m-auto text-center">
                 <x-heroicon-s-chat-bubble-bottom-center-text class="m-auto auto w-8 h-8 md:w-16 md:h-16 text-gray-400" />

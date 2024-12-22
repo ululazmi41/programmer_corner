@@ -104,7 +104,16 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        $corner = $post->corner;
+        $user = User::where('id', Auth::user()->id)->first();
+
+        $joined = $user->corners->contains($corner->id);
+        $owner = $user->createdCorners->contains($corner);
+        if (!$joined && !$owner) {
+            return redirect('/');
+        }
+
+        return view('posts.edit', compact('post', 'corner'));
     }
 
     /**
@@ -112,7 +121,13 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $validate = $request->validate([
+            'title' => ['required'],
+            'content' => ['nullable'],
+        ]);
+
+        $post->update($validate);
+        return redirect()->route('posts.show', ['id' => $post->id]);
     }
 
     /**

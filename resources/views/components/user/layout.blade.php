@@ -45,16 +45,16 @@
                         @endif
                     </div>
                 </a>
-                <a class="flex-shrink-0" href="/users/{{ $user->username }}/likes">
-                    <div class="flex flex-col">
-                        <p class="{{ getSubPage() == 'likes' ? 'font-semibold' : 'text-gray-500' }} ' text-xs sm:text-md lg:text-base hover:text-gray-700' }}"">Likes</p>
-                        @if(getSubPage() == 'likes')
-                            <div class="h-px bg-blue-500"></div>
-                        @endif
-                    </div>
-                </a>
                 @auth
                     @if ($user->id == Auth::id())
+                        <a class="flex-shrink-0" href="/users/{{ $user->username }}/likes">
+                            <div class="flex flex-col">
+                                <p class="{{ getSubPage() == 'likes' ? 'font-semibold' : 'text-gray-500' }} ' text-xs sm:text-md lg:text-base hover:text-gray-700' }}"">Likes</p>
+                                @if(getSubPage() == 'likes')
+                                    <div class="h-px bg-blue-500"></div>
+                                @endif
+                            </div>
+                        </a>
                         <a class="flex-shrink-0" href="/users/{{ $user->username }}/bookmarks">
                             <div class="flex flex-col">
                                 <p class="{{ getSubPage() == 'bookmarks' ? 'font-semibold' : 'text-gray-500' }} ' text-xs sm:text-md lg:text-base hover:text-gray-700' }}"">Bookmarks</p>
