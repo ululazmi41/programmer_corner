@@ -4,21 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Enums\ContentType;
 use App\Enums\NotificationType;
-use App\Enums\UserOverview;
-use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
+use App\Models\Comment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
 use function App\Helpers\addBookmarks;
-use function App\Helpers\addCountsComments;
-use function App\Helpers\addCountsPost;
 use function App\Helpers\addCountsPosts;
+use function App\Helpers\addCountsComments;
 
 class UserController extends Controller
 {

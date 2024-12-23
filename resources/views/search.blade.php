@@ -3,11 +3,16 @@
         <x-left />
         <div class="grid w-full md:w-3/5">
             <div class="flex flex-col">
-                @if(empty($posts))
-                    <div class="grid px-4 w-5/6 m-auto md:w-full">
+                <form class="sm:hidden w-full mt-4 px-8" action="{{ route('search') }}" method="GET">
+                    <input
+                        class="w-full text-gray-700 shadow appearance-none border rounded py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        name="query" id="query" type="text" placeholder="Search" />
+                </form>
+                @if(count($posts) == 0)
+                    <div class="grid px-4 w-5/6 m-auto md:w-full mt-24 lg:mt-32">
                         <div class="grid m-auto text-center">
                             <x-heroicon-o-magnifying-glass class="m-auto auto w-8 h-8 md:w-12 md:h-12" />
-                            <h1 class="font-bold text-sm md:text-lg">There's none around here...</h1>
+                            <h1 class="font-bold text-sm md:text-lg">There's no post found...</h1>
                             <p class="text-xs md:text-md">Hmm... maybe check your spellings or try different word</p>
                         </div>
                     </div>

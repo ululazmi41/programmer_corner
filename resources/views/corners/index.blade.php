@@ -23,11 +23,11 @@
                     @endforeach
                 </div>
             @else
-                <div class="grid px-4 w-5/6 m-auto md:w-full">
+                <div class="grid px-4 w-5/6 m-auto md:w-full mt-16 lg:mt-24">
                     <div class="grid m-auto text-center">
-                        <Image class="m-auto auto w-8 h-8 md:w-16 md:h-16" src="/img/group.png" alt="group.png" />
-                        <h1 class="font-bold text-sm md:text-lg">There's no corner created yet...</h1>
-                        <p class="text-xs md:text-md">Hmm... maybe check again after some time</p>
+                        <Image class="m-auto auto w-12 h-12 md:w-16 md:h-16" src="/img/group.png" alt="group.png" />
+                        <h1 class="font-bold text-sm md:text-lg text-gray-500">There's no corner created yet...</h1>
+                        <p class="text-xs md:text-md text-gray-500">Hmm... maybe check again after some time</p>
                     </div>
                 </div>
             @endif

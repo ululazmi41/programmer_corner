@@ -11,7 +11,6 @@ use App\Http\Controllers\UserController;
 use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 use function App\Helpers\addBookmarks;
@@ -26,10 +25,6 @@ Route::get('/', function () {
     $posts = $sorted;
 
     return view('home', compact('posts'));
-});
-
-Route::get('/test', function () {
-    dd(1);
 });
 
 Route::controller(BookmarkController::class)->group(function () {

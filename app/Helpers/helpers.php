@@ -2,10 +2,10 @@
 
 namespace App\Helpers;
 
-use App\Models\Comment;
 use App\Models\Post;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Collection;
 
 function addBookmarks(Collection $collections): Collection {
     foreach ($collections as $collection) {
