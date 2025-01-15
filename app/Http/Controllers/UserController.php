@@ -421,6 +421,44 @@ class UserController extends Controller
         }
     }
 
+    public function follow(String $username)
+    {
+        $user = User::find(Auth::id());
+        $following = User::where('username', $username)->firstOrFail();
+        $alreadyFollowed = $user->following->contains('id', $following->id);
+
+        if ($alreadyFollowed) {
+            return response()->json([
+                "status" => "ok",
+                "message" => "already followed"
+            ], 200);
+        }
+
+        $user->following()->attach($following);
+        return response()->json([
+            "status" => "ok",
+        ], 200);
+    }
+
+    public function unfollow(String $username)
+    {
+        $user = User::find(Auth::id());
+        $following = User::where('username', $username)->firstOrFail();
+        $notFollowing = !$user->following->contains('id', $following->id);
+
+        if ($notFollowing) {
+            return response()->json([
+                "status" => "ok",
+                "message" => "not following"
+            ], 200);
+        }
+
+        $user->following()->detach($following);
+        return response()->json([
+            "status" => "ok",
+        ], 200);
+    }
+
     public function destroy(User $user) {
         $user->delete();
 

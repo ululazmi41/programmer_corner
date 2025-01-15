@@ -71,4 +71,14 @@ class User extends Authenticatable
     {
         return $this->morphMany(Bookmark::class, 'bookmarkable');
     }
+
+    public function following(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
+    }
+
+    public function followers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
+    }
 }

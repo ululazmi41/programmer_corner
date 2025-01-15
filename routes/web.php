@@ -10,12 +10,20 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use function App\Helpers\addBookmarks;
 use function App\Helpers\addCountsPosts;
 use function App\Helpers\sortPostsByPopularity;
+
+Route::get('test', function() {
+    $user = User::find(Auth::id());
+
+    dd($user->following);
+});
 
 Route::get('/', function () {
     $rawPosts = Post::all();
@@ -96,6 +104,9 @@ Route::controller(UserController::class)->group(function () {
 
         Route::get('likes', 'likes')->middleware('auth')->name('user.likes');
         Route::get('bookmarks', 'bookmarks')->middleware('auth')->name('user.bookmarks');
+
+        Route::post('follow', 'follow')->middleware('auth')->name('user.follow');
+        Route::delete('unfollow', 'unfollow')->middleware('auth')->name('user.unfollow');
     });
 
     Route::prefix("settings")->group(function () {
