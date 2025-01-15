@@ -28,21 +28,23 @@
                 @if (Auth::id() !== $user->id)
                     <button
                         id="follow"
-                        class="{{ $user->followers->contains('id', Auth::id()) ? "hidden" : "" }}"
-                        onclick="follow('{{ $user->id }}');"
-                        class="h-max text-sm font-semibold lg:text-base bg-blue-500 hover:bg-blue-400 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
+                        onclick="follow('{{ $user->id }}', '{{ $user->username }}')"
+                        class="{{ $user->followers->contains('id', Auth::id()) ? "hidden" : "" }} h-max text-sm font-semibold lg:text-base bg-blue-500 hover:bg-blue-400 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
                     >+ follow</button>
                     <button
                         id="unfollow"
-                        onclick="unfollow('{{ $user->id }}');"
-                        class="{{ $user->followers->contains('id', Auth::id()) ? "" : "hidden" }}"
-                        class="h-max text-sm font-semibold lg:text-base bg-black/40 hover:bg-black/30 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
+                        onclick="unfollow('{{ $user->id }}', '{{ $user->username }}')"
+                        class="{{ $user->followers->contains('id', Auth::id()) ? "" : "hidden" }} h-max text-sm font-semibold lg:text-base bg-black/40 hover:bg-black/30 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
                     >✓ following</button>
                 @endif
             </div>
             <div class="flex gap-2">
-                <p class="text-gray-400"><span class="text-black font-semibold">{{ count($user->following) }}</span> following</p>
-                <p class="text-gray-400"><span id="followers-count" class="text-black font-semibold">{{ count($user->followers) }}</span> follower{{ count($user->followers) > 1 ? 's' : '' }}</p>
+                <a href="{{ route('user.following', ['username' => $user->username]) }}">
+                    <p class="text-gray-400"><span class="text-black font-semibold">{{ count($user->following) }}</span> following</p>
+                </a>
+                <a href="{{ route('user.followers', ['username' => $user->username]) }}">
+                    <p class="text-gray-400"><span id="followers-count" class="text-black font-semibold">{{ count($user->followers) }}</span> <span id="followers-label">follower{{ count($user->followers) > 1 ? 's' : '' }}</span></p>
+                </a>
             </div>
             <p>{{ $user["description"] }}</p>
             <p class="text-sm text-gray-400">Joined {{ $user->created_at->format('j F Y') }}
@@ -106,40 +108,28 @@
             unfollowButton.classList.toggle('hidden');
         }
 
-        function follow(userId) {
-            const formData = new FormData();
-            formData.append('user_id', userId);
-
-            fetch('{{ route('user.follow', ['username' => $user->username]) }}', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: formData,
-            })
-
-            toggleFollowButton();
+        function addFollowCount(count) {
             const followersCount = document.querySelector('#followers-count');
-            followersCount.innerText = String(Number(followersCount.innerText) + 1);
+            followersCount.innerText = String(Number(followersCount.innerText) + count);
+
+            const label = document.querySelector('#followers-label');
+            if (Number(followersCount.innerText) > 1) {
+                label.innerText = 'followers';
+            } else {
+                label.innerText = 'follower';
+            }
         }
 
-        function unfollow(userId) {
-            const formData = new FormData();
-            formData.append('user_id', userId);
-
-            fetch('{{ route('user.unfollow', ['username' => $user->username]) }}', {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: formData,
-            })
-
+        async function follow(userId, username) {
+            await helper_follow(userId, username, '{{ $user->username }}');
             toggleFollowButton();
-            const followersCount = document.querySelector('#followers-count');
-            followersCount.innerText = String(Number(followersCount.innerText) - 1);
+            addFollowCount(1);
+        }
+
+        async function unfollow(userId, username) {
+            await helper_unfollow(userId, username, '{{ $user->username }}');
+            toggleFollowButton();
+            addFollowCount(-1);
         }
     </script>
-</x-layout>;
+</x-layout>

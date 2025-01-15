@@ -459,6 +459,18 @@ class UserController extends Controller
         ], 200);
     }
 
+    public function following(String $username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+        return view('users.following', compact('user'));
+    }
+
+    public function followers(String $username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+        return view('users.followers', compact('user'));
+    }
+
     public function destroy(User $user) {
         $user->delete();
 

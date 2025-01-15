@@ -107,6 +107,9 @@ Route::controller(UserController::class)->group(function () {
 
         Route::post('follow', 'follow')->middleware('auth')->name('user.follow');
         Route::delete('unfollow', 'unfollow')->middleware('auth')->name('user.unfollow');
+        
+        Route::get('following', 'following')->middleware('auth')->name('user.following');
+        Route::get('followers', 'followers')->middleware('auth')->name('user.followers');
     });
 
     Route::prefix("settings")->group(function () {
