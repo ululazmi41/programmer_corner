@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Enums\NotificationType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -80,5 +82,30 @@ class User extends Authenticatable
     public function followers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function follow(User $following)
+    {
+        $isFollow = $this->following->contains('id', $following->id);
+        if ($isFollow) {
+            return;
+        }
+        Notification::sendNotification($following->id, $this->id, NotificationType::FOLLOW, User::class, $this->id);
+        $this->following()->attach($following);
+    }
+
+    public function unfollow(User $following)
+    {
+        $isFollow = $this->following->contains('id', $following->id);
+        if (!$isFollow) {
+            return;
+        }
+        Notification::removeNotification($following->id, $this->id, NotificationType::FOLLOW, User::class, $this->id);
+        $this->following()->detach($following);
     }
 }

@@ -11,15 +11,23 @@
                                 <x-heroicon-s-heart class="w-6 h-6 md:w-8 md:h-8 text-red-500" />
                             @elseif ($notification['type'] == \App\Enums\NotificationType::COMMENT)
                                 <x-heroicon-s-chat-bubble-left-right class="w-6 h-6 md:w-8 md:h-8 text-blue-500" />
+                            @elseif ($notification['type'] == \App\Enums\NotificationType::FOLLOW)
+                                <x-heroicon-s-user-plus class="w-6 h-6 md:w-8 md:h-8 text-blue-500" />
                             @endif
                         </div>
                         <div>
                             <div class="flex gap-2">
                                 @foreach ($notification['users'] as $user)
-                                <a href="/users/{{ $user['username'] }}" class="inline-block text-blue-500 hover:underline">
-                                    <img class="my-auto w-6 h-6 sm:w-8 sm:h-8" src="/img/{{ $user['image_url'] }}"
-                                        alt="{{ $user['image_url'] }}">
-                                </a>
+                                @if ($notification['type'] !== \App\Enums\NotificationType::FOLLOW)
+                                    <a href="/users/{{ $user['username'] }}" class="inline-block text-blue-500 hover:underline">
+                                        <img class="my-auto w-6 h-6 sm:w-8 sm:h-8" src="/img/{{ $user['image_url'] }}"
+                                            alt="{{ $user['image_url'] }}">
+                                    </a>
+                                @else
+                                    <a href="/users/{{ $user['username'] }}" class="inline-block text-blue-500 hover:underline">
+                                        <img class="my-auto w-6 h-6 sm:w-8 sm:h-8 rounded-full" src="{{ $user["image_url"] ? asset('storage/icons/' . $user["image_url"]) : "/img/user.png" }}" alt="{{ $user['image_url'] }}">
+                                    </a>
+                                @endif
                                 @endforeach
                             </div>
                             <p class="flex flex-wrap text-gray-500 text-xs md:text-sm leading-tight">
@@ -27,28 +35,36 @@
                                     @if (count($notification['users']) > 1 && $index == count($notification['users']) - 1)
                                         &nbsp;and&nbsp;
                                     @endif
-                                    <a href="/users/{{ $user['username'] }}" class="inline-block text-blue-500 hover:underline">
+                                    <a href="/users/{{ $user['username'] }}" class="inline-block text-blue-500 hover:underline font-semibold">
                                         {{ $user['username'] }}
                                     </a>
                                     @if ($index < count($notification['users']) - 2)
                                         ,&nbsp;
                                     @endif
                                 @endforeach
-                                &nbsp;liked your post.
+                                @if ($notification['type'] === \App\Enums\NotificationType::LIKE)
+                                    &nbsp;liked your post.
+                                @elseif ($notification['type'] === \App\Enums\NotificationType::COMMENT)
+                                    &nbsp;commented your post.
+                                @elseif ($notification['type'] === \App\Enums\NotificationType::FOLLOW)
+                                    &nbsp;followed you.
+                                @endif
                                 </p>
                         </div>
                         <div></div>
                         <div>
-                            <a href="/posts/1">
-                                <p class="text-gray-500 text-xs sm:text-md font-bold leading-tight line-clamp-2">
-                                    {!! $notification['title'] !!}
-                                </p>
-                            </a>
-                            <a href="/posts/1">
-                                <p class="text-gray-500 leading-tight text-xs md:text-sm line-clamp-3">
-                                    {!! $notification['description'] !!}
-                                </p>
-                            </a>
+                            @if ($notification['type'] !== \App\Enums\NotificationType::FOLLOW)
+                                <a href="/posts/1">
+                                    <p class="text-gray-500 text-xs sm:text-md font-bold leading-tight line-clamp-2">
+                                        {!! $notification['title'] !!}
+                                    </p>
+                                </a>
+                                <a href="/posts/1">
+                                    <p class="text-gray-500 leading-tight text-xs md:text-sm line-clamp-3">
+                                        {!! $notification['description'] !!}
+                                    </p>
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @endforeach

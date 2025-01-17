@@ -120,7 +120,7 @@
         </div>
         <x-form.textarea name="body" id="comment-{{ $comment->id }}-reply-body" />
         <div class="flex mt-2">
-            <button onclick="sendReply('{{ $post->id }}', 'reply-body', '{{ $comment->id }}')" class="text-sm lg:text-base bg-blue-500 rounded-lg py-1 px-3 lg:px-4 text-white ml-auto" type="submit">
+            <button onclick="sendReply('{{ $post->id }}', 'reply-body', {{ $comment->id }})" class="text-sm lg:text-base bg-blue-500 rounded-lg py-1 px-3 lg:px-4 text-white ml-auto" type="submit">
                 Submit
             </button>
         </div>
@@ -153,6 +153,7 @@
             })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 const element = data.commentHtml;
                 const RepliesList = document.querySelector(`#comment-${commentId}-replies`);
                 RepliesList.innerHTML += element;

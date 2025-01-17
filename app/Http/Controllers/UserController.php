@@ -17,6 +17,7 @@ use Illuminate\Validation\Rules\Password;
 use function App\Helpers\addBookmarks;
 use function App\Helpers\addCountsPosts;
 use function App\Helpers\addCountsComments;
+use function App\Helpers\getNotifiableData;
 
 class UserController extends Controller
 {
@@ -242,7 +243,41 @@ class UserController extends Controller
     }
 
     public function notifications() {
+        $raw = User::find(Auth::id())->notifications;
+        $notifications = [];
+
+        $notifications_indices = [];
+        foreach ($raw as $notification) {
+
+            $key = $notification->type . '.' .  $notification->notifiable_type . $notification->notifiable_id;
+            if (array_key_exists($key, $notifications_indices)) {
+                dd("already added", $notifications);
+            }
+            
+            $data = [
+                'type' => $notification->type,
+                'users' => [
+                    $notification->notifier,
+                ],
+                'notifiable' => getNotifiableData([
+                    'notifiable_id' => $notification->notifiable_id,
+                    'notifiable_type' => $notification->notifiable_type,
+                ]),
+            ];
+            
+            array_push($notifications_indices, count($notifications));
+            array_push($notifications, $data);
+        }
+
+        dd($raw);
+
         $notifications = [
+            [
+                "type" => NotificationType::FOLLOW,
+                "users" => [
+                    User::where('username', 'b')->firstOrFail(),
+                ]
+            ],
             [
                 "type" => NotificationType::LIKE,
                 "users" => [
@@ -425,16 +460,9 @@ class UserController extends Controller
     {
         $user = User::find(Auth::id());
         $following = User::where('username', $username)->firstOrFail();
-        $alreadyFollowed = $user->following->contains('id', $following->id);
 
-        if ($alreadyFollowed) {
-            return response()->json([
-                "status" => "ok",
-                "message" => "already followed"
-            ], 200);
-        }
+        $user->follow($following);
 
-        $user->following()->attach($following);
         return response()->json([
             "status" => "ok",
         ], 200);
@@ -444,16 +472,9 @@ class UserController extends Controller
     {
         $user = User::find(Auth::id());
         $following = User::where('username', $username)->firstOrFail();
-        $notFollowing = !$user->following->contains('id', $following->id);
 
-        if ($notFollowing) {
-            return response()->json([
-                "status" => "ok",
-                "message" => "not following"
-            ], 200);
-        }
+        $user->unfollow($following);
 
-        $user->following()->detach($following);
         return response()->json([
             "status" => "ok",
         ], 200);

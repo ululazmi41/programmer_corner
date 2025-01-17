@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\NotificationType;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Comment;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -45,6 +47,13 @@ class CommentController extends Controller
             'body' => $request->body,
             'parent_id' => $request->parent_id,
         ]);
+
+        if ($request->parent_id) {
+            $parent = Comment::find($request->parent_id);
+            Notification::sendNotification($parent->user->id, Auth::id(), NotificationType::REPLY, Comment::class, $comment->id);
+        } else {
+            Notification::sendNotification($post->user->id, Auth::id(), NotificationType::COMMENT, Comment::class, $comment->id);
+        }
 
         $unprocessed = Comment::where('id', $comment->id)->with(
                 'views',
@@ -108,6 +117,12 @@ class CommentController extends Controller
     {
         $comment = Comment::find($id);
         $comment->delete();
+
+        if ($comment->parent_id) {
+            Notification::removeNotification($comment->parent->user->id, Auth::id(), NotificationType::REPLY, Comment::class, $comment->id);
+        } else {
+            Notification::removeNotification($comment->post->user->id, Auth::id(), NotificationType::COMMENT, Comment::class, $comment->id);
+        }
 
         return redirect()->back();
     }

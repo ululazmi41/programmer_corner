@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\NotificationType;
 use App\Models\Like;
 use App\Models\Post;
 use App\Models\Comment;
+use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -46,10 +49,13 @@ class LikeController extends Controller
                     'likeable_id' => intval($request->id),
                     'likeable_type' => Post::class,
                 ]);
+                Notification::sendNotification($post->user->id, Auth::id(), NotificationType::LIKE, Post::class, $post->id);
             } else {
                 $like = $post->likes()->where('user_id', Auth::id());
                 $like->delete();
+                Notification::removeNotification($post->user->id, Auth::id(), NotificationType::LIKE, Post::class, $post->id);
             }
+
         } else if ($request->type == 'comment') {
             $comment = Comment::where('id', intval($request->id))->first();
             $alreadyLiked = $comment->likes->contains('user_id', Auth::id());
@@ -59,9 +65,11 @@ class LikeController extends Controller
                     'likeable_id' => intval($request->id),
                     'likeable_type' => Comment::class,
                 ]);
+                Notification::sendNotification($comment->user->id, Auth::id(), NotificationType::LIKE, Comment::class, $comment->id);
             } else {
                 $like = $comment->likes()->where('user_id', Auth::id());
                 $like->delete();
+                Notification::removeNotification($comment->user->id, Auth::id(), NotificationType::LIKE, Comment::class, $comment->id);
             }
         } else {
             return response()->json([

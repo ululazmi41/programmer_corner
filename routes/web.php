@@ -10,9 +10,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use App\Models\Comment;
 use App\Models\Post;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use function App\Helpers\addBookmarks;
@@ -20,9 +18,7 @@ use function App\Helpers\addCountsPosts;
 use function App\Helpers\sortPostsByPopularity;
 
 Route::get('test', function() {
-    $user = User::find(Auth::id());
-
-    dd($user->following);
+    dd('test');
 });
 
 Route::get('/', function () {

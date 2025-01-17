@@ -3,9 +3,27 @@
 namespace App\Helpers;
 
 use App\Models\Post;
+use App\Models\User;
 use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Collection;
+
+function getNotifiableData($notification): Post | Comment | User
+{
+    if ($notification['notifiable_type'] === Post::class) {
+        return Post::find($notification['notifiable_id']);
+    }
+
+    if ($notification['notifiable_type'] === Comment::class) {
+        return Comment::find($notification['notifiable_id']);
+    }
+
+    if ($notification['notifiable_type'] === User::class) {
+        return User::find($notification['notifiable_id']);
+    }
+
+    return null;
+}
 
 function addBookmarks(Collection $collections): Collection {
     foreach ($collections as $collection) {
