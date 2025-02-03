@@ -25,10 +25,15 @@
                 <x-heroicon-o-x-mark class="w-6 h-6 text-gray-500 cursor-pointer" onclick="closeEdit()" />
             </div>
             <input type="hidden" id="type">
-            <input type="hidden" id="old" disabled />
+            <input type="hidden" id="old">
             <input class="{{ getClass('input', $errors) }} text-xs lg:text-md" name="input" id="input" type="text" placeholder="new something" />
             <div class="flex pt-4">
-                <button class="text-sm lg:text-base bg-blue-500 rounded-lg py-1 px-3 lg:px-4 text-white ml-auto" type="submit">Save</button>
+                <button class="text-sm lg:text-base bg-blue-500 rounded-lg py-1 px-3 lg:px-4 text-white ml-auto grid" style="grid-template-areas: stack" type="submit">
+                    <span id="SubmitBtnLabel" style="grid-area: stack">Save</span>
+                    <svg id="SubmitBtnLoading" class="invisible m-auto animate-spin h-5 w-5 text-white" style="grid-area: stack" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M4 12a8 8 0 0116 0" stroke="currentColor" stroke-width="4" fill="none"></path>
+                    </svg>
+                </button>
             </div>
         </div>
     </form>
@@ -83,8 +88,17 @@
                             <x-heroicon-o-chevron-right class="w-4 h-4" />
                         </div>
                     </div>
+                    <div class="flex justify-between">
+                        <p class="text-xs lg:text-base text-gray-500 leading-3">Visibility</p>
+                        <div class="flex gap-2 items-center text-gray-500">
+                            <p id="private" class="text-xs lg:text-base leading-3">{{ $corner->private ? "Private" : "Public" }}</p>
+                        </div>
+                    </div>
                 </div>
                 <h2 class="text-sm sm:text-md lg:text-base font-bold mt-4">Advanced Settings</h2>
+                <a href="{{ route('corners.toggle-visibility', ['corner' => $corner->id]) }}">
+                    <button class="text-xs sm:text-md lg:text-base text-red-500 hover:text-red-700 mt-2" type="submit">Mark as {{ $corner->private ? "public" : "private" }}</button>
+                </a>
                 <form action="{{ route('corners.destroy', ['corner' => $corner->id]) }}" method="POST">
                     @csrf
                     @method('DELETE')
@@ -236,22 +250,20 @@
             
             const old = document.querySelector('#old');
             const type = document.querySelector('#type');
-            const titleElement = document.querySelector('#title');
             const input = document.querySelector('#input');
+            const titleElement = document.querySelector('#title');
 
             type.value = id;
 
             titleElement.innerText = `Edit ${title(id)}`;
             input.placeholder = `New ${title(id)}`;
 
-            if (id === "name") {
+            if (id !== 'description') {
                 old.value = document.querySelector(`#${id}`).innerText;
-            } else {
-                old.classList.add("hidden");
             }
 
-            dialog.classList.remove("hidden");
-            dialog.classList.add("grid");
+            dialog.classList.remove('hidden');
+            dialog.classList.add('grid');
         }
 
         function closeEdit() {
@@ -262,16 +274,17 @@
             dialog.classList.add("hidden");
             dialog.classList.remove("grid");
         }
-        
+
+        function toggleSubmitLoading() {
+            const button = document.querySelector('#SubmitBtnLabel');
+            const loading = document.querySelector('#SubmitBtnLoading');
+            button.classList.toggle('invisible');
+            loading.classList.toggle('invisible');
+        }
+
         const form = document.querySelector('#editDialog');
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-
-            submit();
-        });
-
-        function submit() {
-            event.preventDefault();
 
             const type = document.querySelector('#type');
             const input = document.querySelector('#input');
@@ -281,6 +294,7 @@
                 return;
             }
 
+            toggleSubmitLoading();
             fetch("/corners/{{ $corner->id }}", {
                 method: "PUT",
                 headers: {
@@ -310,12 +324,15 @@
                     const old = document.querySelector(`#${type.value}`);
                     old.innerText = input.value;
                 }
-                closeEdit();
+                setTimeout(() => {
+                    toggleSubmitLoading();
+                    closeEdit();
+                }, 200);
             })
             .catch(error => {
                 console.log(error);
                 input.classList.add("border-red-500");
             });
-        }
+        });
     </script>
 </x-layout>

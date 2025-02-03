@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('icon_url')->nullable();
             $table->string('banner_url')->nullable();
+            $table->boolean('private')->default(false);
             $table->timestamps();
         });
     }

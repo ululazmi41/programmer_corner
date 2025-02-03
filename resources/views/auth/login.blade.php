@@ -35,11 +35,16 @@
                     @enderror
                     <input class="{{ getClass('email', $errors) }}" name="email" id="email" type="text" placeholder="Username or email" value="{{ old("email") }}" />
                     <input class="{{ getClass('password', $errors) }}" name="password" id="password" type="password" placeholder="Password" />
-                    <p class="mb-4">
-                        Don't have an account? <a href="/register" class="cursor-pointer text-blue-600 hover:underline hover:decoration-blue-400 hover:text-blue-400 transition transform">
-                            register
+                    <div class="mb-4">
+                        <p>
+                            Don't have an account? <a href="/register" class="cursor-pointer text-blue-600 hover:underline hover:decoration-blue-400 hover:text-blue-400 transition transform">
+                                register
+                            </a>
+                        </p>
+                        <a href="/dev/profiles" class="cursor-pointer text-blue-600 hover:underline hover:decoration-blue-400 hover:text-blue-400 transition transform">
+                            profiles
                         </a>
-                    </p>
+                    </div>
                 </div>
                 <button
                     class="w-full bg-black hover:opacity-70 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transform transition duration-150"

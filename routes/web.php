@@ -9,7 +9,9 @@ use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use App\Models\Comment;
+use App\Models\Notification;
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,11 +20,18 @@ use function App\Helpers\addCountsPosts;
 use function App\Helpers\sortPostsByPopularity;
 
 Route::get('test', function() {
-    dd('test');
+    dd(Notification::all()->toArray());
+});
+
+Route::get('/dev/profiles', function () {
+    $users = User::all();
+    return view('dev.profiles', compact('users'));
 });
 
 Route::get('/', function () {
-    $rawPosts = Post::all();
+    $rawPosts = Post::whereHas('corner', function ($query) {
+        $query->where('private', false);
+    })->get();
     $addedCounts = addCountsPosts($rawPosts);
     $addedBookmarks = addBookmarks($addedCounts);
     $sorted = sortPostsByPopularity($addedBookmarks);
@@ -90,6 +99,8 @@ Route::controller(CornerController::class)->group(function () {
     Route::post('/create-corner', 'store')->middleware('auth');
 
     Route::delete('/corners/{corner}', 'destroy')->middleware('auth')->name('corners.destroy');
+
+    Route::get('/corners/toggle-visibility/{corner}', 'toggleVisibility')->middleware('auth')->name('corners.toggle-visibility');
 });
 
 Route::controller(UserController::class)->group(function () {

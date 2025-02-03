@@ -29,7 +29,12 @@
             <input class="{{ getClass('input', $errors) }} text-xs lg:text-md" name="input" id="input" type="text" placeholder="new something" />
             <input class="hidden {{ getClass('confirmation', $errors) }} text-xs lg:text-md" name="value_confirmation" id="confirmation" type="text" placeholder="new something" />
             <div class="flex pt-4">
-                <button class="text-sm lg:text-base bg-blue-500 rounded-lg py-1 px-3 lg:px-4 text-white ml-auto" type="submit">Save</button>
+                <button class="relative text-sm lg:text-base bg-blue-500 rounded-lg py-1 px-3 lg:px-4 text-white ml-auto grid" style="grid-template-areas: stack" type="submit">
+                    <span id="SubmitBtnLabel" style="grid-area: stack">Save</span>
+                    <svg id="SubmitBtnLoading" class="invisible m-auto animate-spin h-5 w-5 text-white" style="grid-area: stack" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M4 12a8 8 0 0116 0" stroke="currentColor" stroke-width="4" fill="none"></path>
+                    </svg>
+                </button>
             </div>
         </div>
     </form>
@@ -220,6 +225,13 @@
             submit();
         });
 
+        function toggleSubmitLoading() {
+            const button = document.querySelector('#SubmitBtnLabel');
+            const loading = document.querySelector('#SubmitBtnLoading');
+            button.classList.toggle('invisible');
+            loading.classList.toggle('invisible');
+        }
+
         function submit() {
             event.preventDefault();
 
@@ -231,7 +243,8 @@
                 closeEdit();
                 return;
             }
-            
+
+            toggleSubmitLoading();
             fetch("/settings", {
                 method: "POST",
                 headers: {
@@ -261,7 +274,10 @@
                     const old = document.querySelector(`#${type.value}`);
                     old.innerText = input.value;
                 }
-                closeEdit();
+                setTimeout(() => {
+                    toggleSubmitLoading();
+                    closeEdit();
+                }, 200);
             })
             .catch(error => {
                 console.log(error);

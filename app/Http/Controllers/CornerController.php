@@ -265,4 +265,19 @@ class CornerController extends Controller
 
         return redirect()->route('corners.show', ['handle' => $handle]);
     }
+
+    public function toggleVisibility(String $id)
+    {
+        $user = User::find(Auth::id());
+        $corner = Corner::find($id);
+
+        if ($corner->owner_id !== $user->id) {
+            return redirect()->back();
+        }
+
+        $corner->private = $corner->private === 0 ? 1 : 0;
+        $corner->save();
+
+        return redirect()->back();
+    }
 }
