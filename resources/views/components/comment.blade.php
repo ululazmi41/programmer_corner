@@ -20,12 +20,15 @@
                 <a href="{{ route('users.show', ['username' => $comment->user->username]) }}">
                     {{ '@' }}{{ $comment->user->username }}
                 </a>
-                • {{ $comment->created_at->diffForHumans() }}
+                • <span id="comment-{{ $comment->id }}-date">
+                    {{ $comment->updated_at->diffForHumans() }} {{ $comment->updated_at != $comment->created_at ? '(edited)' : '' }}
+                </span>
             </p>
         </div>
     </div>
     <p id="comment-{{ $comment->id }}-body" class="text-xs lg:text-sm mt-1">{{ $comment->body }}</p>
-    <div class="flex justify-between mt-2">
+    <p id="comment-{{ $comment->id }}-body-old" class="hidden text-xs lg:text-sm mt-1"></p>
+    <div id="comment-{{ $comment->id }}-section" class="flex justify-between mt-2">
         <div class="flex gap-2 sm:gap-3">
             <div id="comment-{{ $comment->id }}-dislike" onclick="toggleCommentLike('{{ $comment->id }}')"
                 class="{{ $comment->liked ?? false ? 'block' : 'hidden' }} text-red-500 hover:text-red-700 flex items-center gap-1 cursor-pointer">
@@ -79,6 +82,13 @@
                             class="hidden peer-checked:block absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
                             role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                             <div class="py-2 px-1 grid gap-2" role="none">
+                                <button
+                                    onclick="edit('{{ $comment->id }}')"
+                                    class="flex gap-2 items-center px-4 text-sm text-gray-500 hover:text-gray-700"
+                                    role="menuitem" tabindex="-1" id="menu-item-2"
+                                    type="submit">
+                                    edit
+                                </button>
                                 <form
                                     action="/comments/{{ $comment->id }}"
                                     method="POST"
@@ -102,6 +112,23 @@
             class="{{ $bookmark ?? false ? 'hidden' : 'block' }}">
             <x-heroicon-o-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
         </div>
+    </div>
+    <div id="comment-{{ $comment->id }}-section-edit" class="hidden gap-1 mt-2">
+        <button
+            class="text-sm bg-blue-500 hover:bg-blue-400 rounded-md py-1 px-2 text-white grid"
+            style="grid-template-areas: stack"
+            onclick="submitEdit('{{ $comment->id }}')">
+            <span id="comment-{{ $comment->id }}-section-edit-label" style="grid-area: stack">Save</span>
+            <svg id="comment-{{ $comment->id }}-section-edit-loading" class="invisible m-auto animate-spin h-5 w-5 text-white" style="grid-area: stack" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M4 12a8 8 0 0116 0" stroke="currentColor" stroke-width="4" fill="none"></path>
+            </svg>
+        </button>
+        <button
+            id="comment-{{ $comment->id }}-section-edit-cancel"
+            class="text-sm bg-gray-500 hover:bg-gray-600 rounded-md py-1 px-2 text-white"
+            onclick="cancelEdit('{{ $comment->id }}')">
+            <span>Cancel</span>
+        </button>
     </div>
     <div id="loading#{{ $comment->id }}" class="hidden w-full">
         <svg class="mx-auto animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -246,6 +273,97 @@
             bookmarkedButton.classList.toggle("block");
             bookmarkingButton.classList.toggle("hidden");
             bookmarkingButton.classList.toggle("block");
+        }
+
+        /* Edit */
+        function edit(id) {
+            const body = document.querySelector(`#comment-${id}-body`);
+            body.contentEditable = true;
+            body.focus();
+            document.execCommand('selectAll', false, null);
+            document.getSelection().collapseToEnd();
+            body.classList = 'text-xs lg:text-sm mt-1 bg-gray-200 border border-gray-400 p-1';
+            
+            const bodyOld = document.querySelector(`#comment-${id}-body-old`);
+            bodyOld.innerText = body.innerText;
+
+            const section = document.querySelector(`#comment-${id}-section`);
+            section.classList.add('hidden');
+            section.classList.remove('flex');
+
+            const sectionEdit = document.querySelector(`#comment-${id}-section-edit`);
+            sectionEdit.classList.remove('hidden');
+            sectionEdit.classList.add('flex');
+        }
+
+        function cancelEdit(id) {
+            const body = document.querySelector(`#comment-${id}-body`);
+            const bodyOld = document.querySelector(`#comment-${id}-body-old`);
+
+            body.innerText = bodyOld.innerText;
+            closeEdit(id);
+        }
+
+        function closeEdit(id) {
+            const body = document.querySelector(`#comment-${id}-body`);
+            body.contentEditable = false;
+            body.blur();
+            body.classList = 'text-xs lg:text-sm mt-1';
+
+            const bodyOld = document.querySelector(`#comment-${id}-body-old`);
+            bodyOld.innerText = '';
+
+            const section = document.querySelector(`#comment-${id}-section`);
+            section.classList.remove('hidden');
+            section.classList.add('flex');
+
+            const sectionEdit = document.querySelector(`#comment-${id}-section-edit`);
+            sectionEdit.classList.add('hidden');
+            sectionEdit.classList.remove('flex');
+        }
+
+        function submitEdit(id) {
+            const label = document.querySelector(`#comment-${id}-section-edit-label`);
+            const loading = document.querySelector(`#comment-${id}-section-edit-loading`);
+
+            label.classList.add('invisible');
+            loading.classList.remove('invisible');
+
+            const cancel = document.querySelector(`#comment-${id}-section-edit-cancel`);
+            cancel.disabled = true;
+            cancel.classList.add('bg-gray-400');
+            cancel.classList.remove('bg-gray-500');
+            cancel.classList.remove('hover:bg-gray-600');
+
+            const body = document.querySelector(`#comment-${id}-body`);
+
+            fetch(`/comments/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    'body': body.innerText,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => console.log(data));
+
+            setTimeout(() => {
+                closeEdit(id);
+                label.classList.remove('invisible');
+                loading.classList.add('invisible');
+
+                cancel.disabled = false;
+                cancel.classList.remove('bg-gray-400');
+                cancel.classList.add('bg-gray-500');
+                cancel.classList.add('hover:bg-gray-600');
+
+                const date = document.querySelector(`#comment-${id}-date`);
+                date.innerText = 'Just now (edited)'
+            }, 200);
         }
     </script>
 </div>

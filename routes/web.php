@@ -69,6 +69,7 @@ Route::controller(CommentController::class)->group(function () {
     });
     Route::post('/comments', 'store')->middleware('auth');
     Route::delete('/comments/{id}', 'destroy')->middleware('auth')->name('comments.destroy');
+    Route::put('/comments/{comment}', 'update')->middleware('auth');
 });
 
 Route::controller(PostController::class)->group(function () {

@@ -107,7 +107,14 @@ class CommentController extends Controller
      */
     public function update(Request $request, Comment $comment)
     {
-        //
+        $validate = $request->validate([
+            'body' => ['required'],
+        ]);
+
+        $comment->update($validate);
+        return response()->json([
+            'status' => 'ok',
+        ]);
     }
 
     /**
