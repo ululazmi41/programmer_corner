@@ -24,7 +24,11 @@
                             alt="{{ $corner["icon_url"] != "" ? $corner["icon_url"] : "group.png" }}">
                         <div>
                             <p class="font-semibold text-sm sm:text-base">{{ $corner["name"] }}</p>
-                            <p class="text-xs sm:text-sm text-gray-500">{{ rand(1, 999) }}K members</p>
+                            <a href="{{ route('corners.members', ['corner' => $corner->id]) }}">
+                                <p class="text-xs sm:text-sm text-gray-500 hover:text-gray-600">
+                                    {{ count($corner->members) }} member{{ count($corner->members) > 1 ? 's' : '' }}
+                                </p>
+                            </a>
                         </div>
                     </div>
                     <div class="flex gap-2 items-center">
@@ -40,7 +44,7 @@
                                 Owner
                             </button>
                         @else
-                            @if ($role == 'member')
+                            @if ($role == 'member' || $role === 'admin')
                                 <a href="{{ getSubPage() . '/leave' }}" class="group">
                                     <button class="text-xs sm:text-sm h-max lg:text-base text-white bg-blue-500 hover:bg-blue-700 rounded-lg py-1 px-3 lg:px-4 ml-auto">
                                         Leave

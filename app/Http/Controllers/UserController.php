@@ -269,7 +269,7 @@ class UserController extends Controller
             array_push($notifications, $data);
         }
 
-        dd($raw);
+        dd($raw->toArray());
 
         $notifications = [
             [

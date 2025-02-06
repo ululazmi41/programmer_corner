@@ -15,7 +15,7 @@
                                     alt="{{ $corner["icon_url"] != "" ? $corner["icon_url"] : "group.png" }}">
                                 <div>
                                     <h2 class="text-sm font-semibold">{{ $corner["name"] }}</h2>
-                                    <p class="text-xs text-gray-500">{{ rand(1, 999) }}K members</p>
+                                    <p class="text-xs text-gray-500">{{ count($corner->members) }} member{{ count($corner->members) > 1 ? 's' : '' }}</p>
                                 </div>
                             </div>
                             <p class="text-sm line-clamp-2 text-gray-500">{{ $corner["description"] }}</p>

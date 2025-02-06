@@ -102,6 +102,10 @@ Route::controller(CornerController::class)->group(function () {
     Route::delete('/corners/{corner}', 'destroy')->middleware('auth')->name('corners.destroy');
 
     Route::get('/corners/toggle-visibility/{corner}', 'toggleVisibility')->middleware('auth')->name('corners.toggle-visibility');
+
+    Route::get('/corners/{corner}/members', 'members')->name('corners.members');
+
+    Route::post('/corners/{corner}/members/{member}/update-role', 'updateRole')->middleware('auth')->name('corners.members.updateRole');
 });
 
 Route::controller(UserController::class)->group(function () {

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\NotificationType;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Corner;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -277,6 +279,37 @@ class CornerController extends Controller
 
         $corner->private = $corner->private === 0 ? 1 : 0;
         $corner->save();
+
+        return redirect()->back();
+    }
+
+    public function members(Corner $corner)
+    {
+        $authorized = false;
+        if (Auth::check()) {
+            $user = User::find(Auth::id());
+            $currentCorner = $user->corners()->where('corners.id', $corner->id)->first();
+            if ($currentCorner) {
+                $role = $currentCorner->pivot->role;
+                $authorized = $role === 'owner' || $role === 'admin';
+            }
+        }
+
+        return view('corners.members', compact('corner', 'authorized'));
+    }
+
+    public function updateRole(Corner $corner, User $member, Request $request)
+    {
+        $request->validate([
+            'role' => ['required'],
+        ]);
+        $member->corners()->updateExistingPivot($corner->id, ['role' => $request->role]);
+
+        if ($request->role === 'admin') {
+            Notification::sendNotification($member->id, Auth::id(), NotificationType::PROMOTE, Corner::class, $corner->id);
+        } else if ($request->role === 'member') {
+            Notification::sendNotification($member->id, Auth::id(), NotificationType::DEMOTE, Corner::class, $corner->id);
+        }
 
         return redirect()->back();
     }

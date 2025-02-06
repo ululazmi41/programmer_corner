@@ -54,7 +54,7 @@
                     <image id="icon" class="w-12 h-12 my-2" src="{{ $corner->icon_url ? asset('storage/icons/' . $corner->icon_url) : "/img/group.png" }}" alt="group.png" />
                     <div>
                         <h2 class="text-sm font-semibold">{{ $corner["name"] }}</h2>
-                        <p class="text-xs text-gray-500">{{ $corner->members_count }} member{{ $corner->members_count > 1 ? 's' : '' }}</p>
+                        <p class="text-xs text-gray-500">{{ count($corner->members) }} member{{ count($corner->members) > 1 ? 's' : '' }}</p>
                     </div>
                 </div>
                 <div class="space-y-2 mt-4 items-center justify-between lg:justify-start lg:gap-2">

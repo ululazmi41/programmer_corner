@@ -18,7 +18,7 @@ return new class extends Migration
             $table->ForeignIdFor(User::class, 'notifier_id')->constrained()->cascadeOnDelete();
             $table->morphs('notifiable');
             $table->boolean('read')->default(false);
-            $table->enum('type', ['like', 'comment', 'follow', 'reply']);
+            $table->enum('type', ['like', 'comment', 'follow', 'reply', 'promote', 'demote']);
             $table->timestamps();
         });
     }

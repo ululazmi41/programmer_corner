@@ -8,4 +8,6 @@ enum NotificationType: string
     case FOLLOW = 'follow';
     case COMMENT = 'comment';
     case REPLY = 'reply';
+    case PROMOTE = 'promote';
+    case DEMOTE = 'demote';
 }

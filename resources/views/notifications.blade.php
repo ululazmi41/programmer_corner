@@ -13,6 +13,8 @@
                                 <x-heroicon-s-chat-bubble-left-right class="w-6 h-6 md:w-8 md:h-8 text-blue-500" />
                             @elseif ($notification['type'] == \App\Enums\NotificationType::FOLLOW)
                                 <x-heroicon-s-user-plus class="w-6 h-6 md:w-8 md:h-8 text-blue-500" />
+                            @elseif ($notification['type'] == \App\Enums\NotificationType::PROMOTEADMIN)
+                                <x-heroicon-s-user-plus class="w-6 h-6 md:w-8 md:h-8 text-blue-500" />
                             @endif
                         </div>
                         <div>
@@ -48,6 +50,8 @@
                                     &nbsp;commented your post.
                                 @elseif ($notification['type'] === \App\Enums\NotificationType::FOLLOW)
                                     &nbsp;followed you.
+                                @elseif ($notification['type'] === \App\Enums\NotificationType::PROMOTEADMIN)
+                                    &nbsp;you are promoted as admin.
                                 @endif
                                 </p>
                         </div>
