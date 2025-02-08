@@ -6,10 +6,22 @@ use App\Models\Post;
 use App\Models\User;
 use App\Models\Comment;
 use App\Models\Corner;
+use App\Enums\NotificationType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Collection;
 
-function getNotifiableData($notification): Post | Comment | User | Corner
+function getNotificationEnumFromString(String $enum): NotificationType
+{
+    foreach (NotificationType::cases() as $case) {
+        if ($case->value === $enum) {
+            return $case;
+        }
+    }
+
+    return null;
+}
+
+function getNotifiableData($notification): Post | Comment | User | Corner | null
 {
     if ($notification['notifiable_type'] === Post::class) {
         return Post::find($notification['notifiable_id']);

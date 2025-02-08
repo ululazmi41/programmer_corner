@@ -13,6 +13,7 @@ use App\Models\Notification;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use function App\Helpers\addBookmarks;
@@ -20,7 +21,7 @@ use function App\Helpers\addCountsPosts;
 use function App\Helpers\sortPostsByPopularity;
 
 Route::get('test', function() {
-    dd(Notification::all()->toArray());
+    dd(User::find(Auth::id())->notifications->toArray());
 });
 
 Route::get('/dev/profiles', function () {

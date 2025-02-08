@@ -5,6 +5,7 @@
             <x-heroicon-s-home class="w-6 h-6 hidden group-hover:block" />
             Home
         </a></li>
+        @auth
         <li><a href="/chat" class="relative group flex gap-2 text-sm py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
             <x-heroicon-o-chat-bubble-left-ellipsis class="w-6 h-6 group-hover:hidden" />
             <x-heroicon-s-chat-bubble-left-ellipsis class="w-6 h-6 hidden group-hover:block" />
@@ -15,6 +16,7 @@
             <x-heroicon-s-bell class="w-6 h-6 hidden group-hover:block" />
             Notifications
         </a></li>
+        @endauth
         <li><a href="/corners" class="relative group flex gap-2 text-sm py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
             <x-heroicon-o-rectangle-group class="w-6 group-hover:hidden" />
             <x-heroicon-s-rectangle-group class="w-6 h-6 hidden group-hover:block" />
