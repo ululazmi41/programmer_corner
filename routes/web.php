@@ -29,6 +29,10 @@ Route::get('/dev/profiles', function () {
     return view('dev.profiles', compact('users'));
 });
 
+Route::get('/chat', function () {
+    return view('chat');
+})->middleware('auth')->name('chat');
+
 Route::get('/', function () {
     $rawPosts = Post::whereHas('corner', function ($query) {
         $query->where('private', false);
