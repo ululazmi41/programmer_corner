@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Conversation;
+use App\Models\Chat\Conversation;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

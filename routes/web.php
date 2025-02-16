@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CornerController;
 use App\Http\Controllers\LikeController;
@@ -29,9 +30,10 @@ Route::get('/dev/profiles', function () {
     return view('dev.profiles', compact('users'));
 });
 
-Route::get('/chat', function () {
-    return view('chat');
-})->middleware('auth')->name('chat');
+Route::controller(ChatController::class)->prefix('chat')->group(function () {
+    Route::get('/', 'index')->middleware('auth')->name('chat');
+    Route::get('/{id}', 'fetch');
+});
 
 Route::get('/', function () {
     $rawPosts = Post::whereHas('corner', function ($query) {

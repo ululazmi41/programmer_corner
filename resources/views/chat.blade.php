@@ -11,7 +11,17 @@
     <div class="h-screen flex">
         <div class="w-1/5 px-4 py-2">
             <h2 class="py-4 text-xl font-semibold">Chat</h2>
-            <div class="">
+            <div id="chatrooms" class="grid gap-1">
+                @foreach ($chatrooms as $room)
+                    <x-chat.chatroom
+                        :$room
+                        onclick="select(
+                            {{ $room['conversation_id'] }},
+                            '{{ $room['type'] }}',
+                            '{{ $room['name'] }}',
+                            '{{ asset('storage/icons/' . $room['image_url']) }}',
+                            '{{ $room['image_url'] }}')" />
+                @endforeach
                 <div class="flex gap-2 p-2 items-center bg-gray-200 transition cursor-pointer">
                     <Image class="w-10 h-10 inline" src="/img/{{ 'javascript.png' }}" alt="{{ 'javascript.png' }}" />
                     <div>
@@ -57,12 +67,9 @@
             </div>
         </div>
         <div class="w-4/5 px-4 pt-2 pb-4 flex flex-col">
-            <div class="flex gap-2 p-2 items-center hover:bg-gray-100 transition cursor-pointer">
-                <Image class="w-8 h-8 inline" src="/img/{{ 'javascript.png' }}" alt="{{ 'javascript.png' }}" />
-                <div>
-                    <p class="leading-tight text-sm font-bold">Javascript</p>
-                    <p class="leading-tight text-sm">1 member</p>
-                </div>
+            <div class="flex gap-2 p-2 items-center transition cursor-pointer">
+                <Image id="room-icon" class="w-8 h-8 inline" src="/img/{{ 'javascript.png' }}" alt="{{ 'javascript.png' }}" />
+                <p id="room-name" class="leading-tight text-sm font-bold">Javascript</p>
             </div>
             <div class="flex-1 overflow-y-auto space-y-2 no-scrollbar pt-4 pb-2">
                 <div class="flex gap-2">
@@ -246,5 +253,71 @@
             </div> --}}
         </div>
     </div>
+
+    <script>
+        window.onload = () => {
+            conversationId = sessionStorage.getItem('conversationId');
+            roomType = sessionStorage.getItem('roomType');
+
+            roomName = sessionStorage.getItem('roomName');
+            roomImageUrl = sessionStorage.getItem('roomImageUrl');
+            roomImageUrlAlt = sessionStorage.getItem('roomImageUrlAlt');
+
+            if (conversationId) {
+                const chatroomWrapper = document.querySelector(`#room-${conversationId}`);
+                const roomNameElement = document.querySelector('#room-name');
+                const roomIconElement = document.querySelector('#room-icon');
+                const chatrooms = document.querySelector('#chatrooms');
+                const divs = chatrooms.querySelectorAll('div');
+
+                chatroomWrapper.classList.add('bg-gray-200');
+                chatroomWrapper.classList.remove('hover:bg-gray-100');
+
+                roomNameElement.innerText = roomName;
+                roomIconElement.src = roomImageUrl;
+                roomIconElement.alt = roomImageUrlAlt;
+            }
+        }
+
+        function select(conversationId, roomType, roomName, roomImageUrl, roomImageUrlAlt) {
+            sessionStorage.setItem('conversationId', conversationId);
+            sessionStorage.setItem('roomType', roomType);
+            sessionStorage.setItem('roomName', roomName);
+            sessionStorage.setItem('roomImageUrl', roomImageUrl);
+            sessionStorage.setItem('roomImageUrlAlt', roomImageUrlAlt);
+
+            fetch(`/chat/` + conversationId)
+                .then(response => response.json())
+                .then(data => {
+
+                    const chatroomWrapper = document.querySelector(`#room-${conversationId}`);
+                    const roomNameElement = document.querySelector('#room-name');
+                    const roomIconElement = document.querySelector('#room-icon');
+                    const chatrooms = document.querySelector('#chatrooms');
+                    const divs = chatrooms.querySelectorAll('div');
+
+                    divs.forEach(div => {
+                        if (div.classList.contains('bg-gray-200')) {
+                            div.classList.remove('bg-gray-200');
+                            div.classList.add('hover:bg-gray-100');
+                        }
+                    });
+
+                    chatroomWrapper.classList.add('bg-gray-200');
+                    chatroomWrapper.classList.remove('hover:bg-gray-100');
+
+                    if (roomType === 'group') {
+                        roomIconElement.classList.add('rounded-lg');
+                    } else {
+                        roomIconElement.classList.remove('rounded-lg');
+                    }
+
+                    roomNameElement.innerText = roomName;
+                    roomIconElement.src = roomImageUrl;
+                    roomIconElement.alt = roomImageUrlAlt;
+                });
+            // render(conversation['image_url'], conversation['name'])
+        }
+    </script>
 </body>
 </html>
