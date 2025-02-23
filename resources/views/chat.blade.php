@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="h-screen flex">
-        <div class="w-1/5 px-4 py-2">
+        <div class="w-1/5 px-4 py-2 no-scrollbar max-h-screen overflow-y-auto">
             <h2 class="py-4 text-xl font-semibold">Chat</h2>
             <div id="chatrooms" class="grid gap-1">
                 @foreach ($chatrooms as $room)
