@@ -24,6 +24,7 @@
                             '{{ $room['name'] }}',
                             '{{ asset('storage/icons/' . $room['image_url']) }}',
                             '{{ $room['image_url'] }}',
+                            '{{ $room['corner_id'] }}',
                             '{{ $room['handle'] }}');" />
                 @endforeach
                 <div class="flex gap-2 p-2 items-center hover:bg-gray-200 transition cursor-pointer">
@@ -100,175 +101,6 @@
             <div
                 id="chat"
                 class="hidden flex-1 overflow-y-auto space-y-2 no-scrollbar pt-4 pb-2">
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'javascript.png' }}" alt="{{ 'javascript.png' }}" />
-                    <div>
-                        <p class="text-sm font-bold leading-tight">Javascript</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg w-max h-max border border-black/20">
-                            Welcome everyone, This will be our official group on this forums.
-                        </div>
-                    </div>
-                </div>
-                <div class="flex justify-center">
-                    <div class="bg-gray-200 text-sm py-1 px-2 rounded-lg w-max border border-black/20 grid">
-                        Ulul Azmi joined the group
-                    </div>
-                </div>
-                <div class="flex justify-end">
-                    <div class="bg-green-200 py-1 px-2 rounded-lg w-max border border-black/20 grid">
-                        Hey! Looks good so far. Excited to be part of this!
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div>
-                        <p class="text-sm"><span class="font-bold leading-tight">Lucy</span> (admin)</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg w-max h-max border border-black/20">
-                            Welcome! 😄
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div>
-                        <p class="text-sm"><span class="font-bold leading-tight">Sarah</span></p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg w-max h-max border border-black/20">
-                            Same here! What's the main focus of this group again? 🤔
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm"><span class="font-bold leading-tight">Lucy</span> (admin)</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            Great question, Sarah! This group is for discussing all things related to the forum—updates, feedback, and community events. We'll also be sharing tips and answering any questions you might have. 😊
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm font-bold leading-tight">Mike</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            Sounds awesome! Can't wait to see what everyone shares here. 👍
-                        </div>
-                    </div>
-                </div>
-                <div class="flex justify-end">
-                    <div class="bg-green-200 max-w-[50%] py-1 px-2 rounded-lg w-max border border-black/20 grid">
-                        Nice, I'm curious about the upcoming forum features. Do we have a timeline for that?
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm"><span class="font-bold leading-tight">Lucy</span> (admin)</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            We're working on it! We should have more info by next week. Stay tuned! 📅
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm font-bold leading-tight">John</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            Will we be able to request new features or improvements here too? Like a "suggestions box"? 🤔
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm"><span class="font-bold leading-tight">Lucy</span> (admin)</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            Absolutely! Feel free to drop your suggestions anytime. We’ll take them into account.
-                        </div>
-                    </div>
-                </div>
-                <div class="flex justify-end">
-                    <div class="bg-green-200 max-w-[50%] py-1 px-2 rounded-lg w-max border border-black/20 grid">
-                        Love that! By the way, do we have a group code of conduct, or should we just keep things friendly and respectful? 😅
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm"><span class="font-bold leading-tight">Lucy</span> (admin)</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            Good point, Sarah! Let's keep things respectful and friendly. We want everyone to feel welcome here! I'll post some guidelines in a pinned message later. 😊
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm font-bold leading-tight">Mike</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            Perfect! Just making sure, we'll also be able to share media like images and videos, right? 📸
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm"><span class="font-bold leading-tight">Lucy</span> (admin)</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            Yes! You'll be able to share images, videos, and links once the settings are finalized. More details coming soon!
-                        </div>
-                    </div>
-                </div>
-                <div class="flex justify-end">
-                    <div class="bg-green-200 max-w-[50%] py-1 px-2 rounded-lg w-max border border-black/20 grid">
-                        Awesome! Can't wait to dive into the discussions. 😎
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm"><span class="font-bold leading-tight">Lucy</span> (admin)</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            Thanks for the enthusiasm, everyone! Let's keep the energy going. Feel free to introduce yourselves and tell us what you're most excited about in the forum!
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm font-bold leading-tight">Emily</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            Sure! I'm Emily, and I'm here for all the behind-the-scenes updates! Always love getting the inside scoop! 👀
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm font-bold leading-tight">Sarah</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            I'm Sarah! I'll be here for any community-building discussions and ideas. Always up for some fun conversations! 💬
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm font-bold leading-tight">John</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            John here! I'm into gaming and memes. So yeah, expect some fun posts from me! 😂
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'user.png' }}" alt="{{ 'user.png' }}" />
-                    <div class="max-w-[50%]">
-                        <p class="text-sm"><span class="font-bold leading-tight">Lucy</span> (admin)</p>
-                        <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg h-max border border-black/20">
-                            Love all these introductions! Let's keep the conversation going. Don't forget to check out the pinned posts for updates. More soon! 😊
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <form
@@ -292,15 +124,17 @@
     <script>
         window.onload = () => {
             const roomId = sessionStorage.getItem('roomId');
-            const userId = sessionStorage.getItem('userId');
             const roomType = sessionStorage.getItem('roomType');
             const roomName = sessionStorage.getItem('roomName');
             const roomImageUrl = sessionStorage.getItem('roomImageUrl');
             const conversationId = sessionStorage.getItem('conversationId');
             const roomImageUrlAlt = sessionStorage.getItem('roomImageUrlAlt');
+            const cornerId = sessionStorage.getItem('cornerId');
             const handle = sessionStorage.getItem('handle');
 
-            select(roomId, userId, conversationId, roomType, roomName, roomImageUrl, roomImageUrlAlt, handle);
+            if (roomId) {
+                select(roomId, {{ Auth::id() }}, conversationId, roomType, roomName, roomImageUrl, roomImageUrlAlt, cornerId, handle);
+            }
         }
 
         function isAtBottom() {
@@ -345,12 +179,16 @@
                 const roomId = sessionStorage.getItem('roomId');
                 const lastMessage = document.querySelector(`#room-${roomId}-last-message`);
                 lastMessage.innerText = `you: ${message.value}`;
+
+                const input = document.querySelector('#message');
+                input.value = '';
             });
         });
 
-        function join(userId, conversationId) {
+        function join(userId, cornerId, conversationId) {
             const formData = new FormData();
             formData.append('userId', userId);
+            formData.append('cornerId', cornerId);
             formData.append('conversationId', conversationId);
 
             fetch('/chat/join', {
@@ -363,7 +201,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                sessionStorage.setItem('isMember', true);
+                sessionStorage.setItem('role', 'member');
 
                 const leaveElement = document.querySelector('#leave');
                 const message = document.querySelector('#message');
@@ -374,13 +212,13 @@
 
                 message.classList.remove('hidden');
                 messageJoin.classList.add('hidden');
-                leaveElement.classList.remove('hidden');
 
+                leaveElement.classList.remove('hidden');
                 leaveElement.onclick = () => leave(userId, conversationId);
             });
         }
 
-        function select(roomId, userId, conversationId, roomType, roomName, roomImageUrl, roomImageUrlAlt, handle) {
+        function select(roomId, userId, conversationId, roomType, roomName, roomImageUrl, roomImageUrlAlt, cornerId, handle) {
             sessionStorage.setItem('roomId', roomId);
             sessionStorage.setItem('userId', userId);
             sessionStorage.setItem('conversationId', conversationId);
@@ -388,13 +226,13 @@
             sessionStorage.setItem('roomName', roomName);
             sessionStorage.setItem('roomImageUrl', roomImageUrl);
             sessionStorage.setItem('roomImageUrlAlt', roomImageUrlAlt);
+            sessionStorage.setItem('cornerId', cornerId);
             sessionStorage.setItem('handle', handle);
 
             fetch(`/chat/` + conversationId)
                 .then(response => response.json())
                 .then(data => {
-                    const isMember = data['is_member'];
-                    sessionStorage.setItem('isMember', isMember);
+                    sessionStorage.setItem('role', data['role']);
 
                     const message = document.querySelector('#message');
                     const messageJoin = document.querySelector('#message_join');
@@ -406,6 +244,7 @@
                     chat.classList.remove('hidden');
 
                     const leaveElement = document.querySelector('#leave');
+                    const isMember = data['role'] !== 'inactive';
 
                     if (isMember) {
                         message.classList.remove('hidden');
@@ -417,7 +256,7 @@
                     } else {
                         message.classList.add('hidden');
                         messageJoin.classList.remove('hidden');
-                        messageJoin.onclick = () => join(userId, conversationId);
+                        messageJoin.onclick = () => join(userId, cornerId, conversationId);
 
                         leaveElement.classList.add('hidden');
                     }
@@ -459,7 +298,7 @@
                     roomIconElement.src = roomImageUrl;
                     roomIconElement.alt = roomImageUrlAlt;
 
-                    renderMessages(data['messages']);
+                    renderMessages(data['messages'], data['role']);
                 });
         }
 
@@ -487,11 +326,13 @@
 
                 const messageJoin = document.querySelector('#message_join');
                 messageJoin.classList.remove('hidden');
-                messageJoin.onclick = () => join(userId, conversationId);
+
+                const cornerId = sessionStorage.getItem('cornerId');
+                messageJoin.onclick = () => join(userId, cornerId, conversationId);
             });
         }
 
-        function renderMessages(messages) {
+        function renderMessages(messages, role) {
             const chat = document.querySelector('#chat');
             chat.innerHTML = '';
 
@@ -506,8 +347,19 @@
                         const messageElement = createMyMessage(message['content']);
                         chat.appendChild(messageElement);
                     } else {
-                        const messageElement = createOppositeMessage(message);
+                        const messageElement = createOppositeMessage(message, role);
                         chat.appendChild(messageElement);
+
+                        document.addEventListener('click', () => {
+                            const dropdownToggle = document.getElementById(`message-${message['id']}-dropdown-toggle`);
+                            const dropdownMenu = document.getElementById(`message-${message['id']}-dropdown-menu`);
+
+                            if (dropdownMenu !== null) {
+                                if (!dropdownMenu.contains(event.target) && event.target !== dropdownToggle) {
+                                    dropdownToggle.checked = false;
+                                }
+                            }
+                        });
                     }
                 }
             }
@@ -526,7 +378,7 @@
             return div;
         }
 
-        function createOppositeMessage(message) {
+        function createOppositeMessage(message, role) {
             let baseUrl = window.location.protocol + "//" + window.location.hostname + "/";
 
             const div = document.createElement('div');
@@ -550,35 +402,96 @@
             }
 
             const innerDiv = document.createElement('div');
-            const p = document.createElement('p');
+
+            const nameMenus = document.createElement('div');
+            nameMenus.classList = 'flex gap-2';
 
             const pWrapper = document.createElement('a');
             pWrapper.href = `${baseUrl}users/${message['user']['username']}`;
             pWrapper.target = '_blank';
             pWrapper.rel = 'noopener noreferrer';
-            pWrapper.classList = 'w-max inline-block leading-tight';
+            pWrapper.classList = 'w-max inline-block';
 
-            p.classList ='text-sm w-max';
+            const p = document.createElement('p');
+            p.classList ='w-max font-bold';
+            p.innerText = message['user']['name'];
 
-            const span = document.createElement('span');
-            span.classList = 'font-bold leading-tight';
-
-            span.innerText = message['user']['name'];
-
-            p.appendChild(span);
             pWrapper.appendChild(p);
+
+            nameMenus.appendChild(pWrapper);
+
+            if (role === 'owner' || role === 'admin') {
+                const wrapper = document.createElement('div');
+                wrapper.classList = 'relative inline-block text-left';
+
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.id = `message-${message['id']}-dropdown-toggle`;
+                input.classList = 'hidden peer';
+
+                const label = document.createElement('label');
+                label.setAttribute('for', `message-${message['id']}-dropdown-toggle`);
+                label.innerText = '⋯';
+                label.classList = 'text-lg cursor-pointer';
+
+                const menuWrapper = document.createElement('div');
+                menuWrapper.id = `message-${message['id']}-dropdown-menu`;
+                menuWrapper.classList = 'hidden peer-checked:block absolute left-0 z-10 mt-2 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none';
+                menuWrapper.role = 'menu';
+                menuWrapper.setAttribute('aria-orientation', 'vertical');
+                menuWrapper.setAttribute('aria-labelledby', 'menu-button');
+
+                const itemsWrapper = document.createElement('div');
+                itemsWrapper.classList = 'py-2 px-1 grid gap-2';
+                itemsWrapper.role = 'none';
+
+                const button = document.createElement('button');
+
+                button.onclick = () => {
+                    remove(message['user_id'], message['conversation_id']);
+                    input.checked = false;
+                };
+                button.classList = 'flex gap-2 items-center px-4 text-sm text-gray-500 hover:text-gray-700';
+                button.role = 'menuitem';
+                button.id = 'menu-item-1';
+                button.innerText = 'remove';
+
+                itemsWrapper.appendChild(button);
+                menuWrapper.appendChild(itemsWrapper);
+
+                wrapper.appendChild(input);
+                wrapper.appendChild(label);
+                wrapper.appendChild(menuWrapper);
+
+                nameMenus.appendChild(wrapper);
+            }
 
             const contentDiv = document.createElement('div');
             contentDiv.classList = 'text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg w-max h-max border border-black/20';
             contentDiv.innerText = message['content'];
 
-            innerDiv.appendChild(pWrapper);
+            innerDiv.appendChild(nameMenus);
             innerDiv.appendChild(contentDiv);
 
             div.appendChild(imageWrapper);
             div.appendChild(innerDiv);
 
             return div;
+        }
+
+        function remove(userId, conversationId) {
+            const formData = new FormData();
+            formData.append('userId', userId);
+            formData.append('conversationId', conversationId);
+            
+            fetch('/chat/rem', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: formData,
+            });
         }
 
         function createSystemMessage(message) {

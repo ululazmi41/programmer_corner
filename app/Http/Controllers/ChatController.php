@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Chat\Conversation;
 use App\Models\Chat\Message;
 use App\Models\Chat\Participant;
+use App\Models\Corner;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +29,7 @@ class ChatController extends Controller
             $data = [
                 'id' => $corner->conversation->id,
                 'name' => $corner->name,
+                'corner_id' => $corner->id,
                 'handle' => $corner->handle,
                 'type' => 'group',
                 'image_url' => $corner->icon_url,
@@ -57,10 +59,12 @@ class ChatController extends Controller
     {
         $request->validate([
             'userId' => 'required',
+            'cornerId' => 'required',
             'conversationId' => 'required',
         ]);
 
         $user = User::find($request->userId);
+        $corner = Corner::find($request->cornerId);
         $conversation = Conversation::find($request->conversationId);
 
         $alreadyParticipated = Participant::where('user_id', $user->id)->where('conversation_id', $conversation->id)->exists();
@@ -72,10 +76,21 @@ class ChatController extends Controller
             ]);
         }
 
-        $participant = Participant::create([
-            'user_id' => $user->id,
-            'conversation_id' => $conversation->id,
-        ]);
+        $participant = null;
+        $isOwner = $user->id === $corner->id;
+        if ($isOwner) {
+            $participant = Participant::create([
+                'user_id' => $user->id,
+                'conversation_id' => $conversation->id,
+                'role' => 'owner',
+            ]);
+        } else {
+            $participant = Participant::create([
+                'user_id' => $user->id,
+                'conversation_id' => $conversation->id,
+            ]);
+            
+        }
 
         Message::create([
             'user_id' => null,
@@ -98,12 +113,16 @@ class ChatController extends Controller
         $conversation = Conversation::find($id);
         $messages = Message::with(['user', 'targetUser'])->where('conversation_id', $conversation->id)->get();
         $participants = Participant::where('conversation_id', $conversation->id);
-        $isMember = Participant::where('conversation_id', $conversation->id)
-                        ->where('user_id', Auth::id())
-                        ->exists();
+        $participant = Participant::where('conversation_id', $conversation->id)
+                        ->where('user_id', Auth::id());
+
+        $role = 'inactive';
+        if ($participant->exists()) {
+            $role = $participant->firstOrFail()->role;
+        }
 
         return response()->json([
-            'is_member' => $isMember,
+            'role' => $role,
             'id' => $conversation->id,
             'type' => $conversation->type,
             'messages' => $messages,
@@ -148,6 +167,20 @@ class ChatController extends Controller
             'is_system' => true,
             'target_user_id' => Auth::id(),
         ]);
+
+        return response()->json([
+            'status' => 'ok',
+        ]);
+    }
+
+    public function remove(Request $request) {
+        $request->validate([
+            'userId' => 'required',
+            'conversationId' => 'required',
+        ]);
+
+        $participant = Participant::where('user_id', $request->userId)->where('conversation_id', $request->conversationId)->firstOrFail();
+        $participant->delete();
 
         return response()->json([
             'status' => 'ok',

@@ -36,6 +36,7 @@ Route::controller(ChatController::class)->prefix('chat')->group(function () {
     Route::get('/{id}', 'fetch');
     Route::post('/send-message', 'sendMessage');
     Route::post('/leave', 'leave');
+    Route::post('/remove', 'remove');
 });
 
 Route::get('/', function () {
