@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Chat | PiCorner</title>
@@ -16,13 +17,16 @@
                     <x-chat.chatroom
                         :$room
                         onclick="select(
+                            {{ $room['id'] }},
+                            {{ Auth::id() }},
                             {{ $room['conversation_id'] }},
                             '{{ $room['type'] }}',
                             '{{ $room['name'] }}',
                             '{{ asset('storage/icons/' . $room['image_url']) }}',
-                            '{{ $room['image_url'] }}')" />
+                            '{{ $room['image_url'] }}',
+                            '{{ $room['handle'] }}');" />
                 @endforeach
-                <div class="flex gap-2 p-2 items-center bg-gray-200 transition cursor-pointer">
+                <div class="flex gap-2 p-2 items-center hover:bg-gray-200 transition cursor-pointer">
                     <Image class="w-10 h-10 inline" src="/img/{{ 'javascript.png' }}" alt="{{ 'javascript.png' }}" />
                     <div>
                         <p class="leading-tight text-sm font-bold">Javascript</p>
@@ -67,11 +71,35 @@
             </div>
         </div>
         <div class="w-4/5 px-4 pt-2 pb-4 flex flex-col">
-            <div class="flex gap-2 p-2 items-center transition cursor-pointer">
-                <Image id="room-icon" class="w-8 h-8 inline" src="/img/{{ 'javascript.png' }}" alt="{{ 'javascript.png' }}" />
-                <p id="room-name" class="leading-tight text-sm font-bold">Javascript</p>
+            <div class="flex justify-between">
+                <div class="flex gap-2 p-2 items-center transition">
+                    <a id="room-icon-wrapper" href="#">
+                        <Image id="room-icon" class="w-8 h-8 inline" src="/img/{{ 'javascript.png' }}" alt="{{ 'javascript.png' }}" />
+                    </a>
+                    <a id="room-name-wrapper" href="#">
+                        <p id="room-name" class="leading-tight text-sm font-bold">Javascript</p>
+                    </a>
+                </div>
+                <button
+                    id="leave"
+                    class="hidden text-sm hover:text-red-400 px-2 py-1 rounded-md">
+                    Leave
+                </button>
             </div>
-            <div class="flex-1 overflow-y-auto space-y-2 no-scrollbar pt-4 pb-2">
+
+            <div
+                id="introduction"
+                class="col-span-4 p-4 m-auto">
+                <div class="text-center">
+                    <x-heroicon-c-chat-bubble-left-right class="w-48 h-48 text-blue-400" />
+                    <p class="font-bold">Welcome to chat!</p>
+                    <p>Select corner or people to chat</p>
+                </div>
+            </div>
+
+            <div
+                id="chat"
+                class="hidden flex-1 overflow-y-auto space-y-2 no-scrollbar pt-4 pb-2">
                 <div class="flex gap-2">
                     <Image class="w-8 h-8 inline rounded-full" src="/img/{{ 'javascript.png' }}" alt="{{ 'javascript.png' }}" />
                     <div>
@@ -79,6 +107,11 @@
                         <div class="text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg w-max h-max border border-black/20">
                             Welcome everyone, This will be our official group on this forums.
                         </div>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <div class="bg-gray-200 text-sm py-1 px-2 rounded-lg w-max border border-black/20 grid">
+                        Ulul Azmi joined the group
                     </div>
                 </div>
                 <div class="flex justify-end">
@@ -238,61 +271,162 @@
                 </div>
             </div>
 
-            <input
-                type="text"
-                class="flex w-full px-4 py-1 bg-gray-200 border border-lg border-gray-400 min-h-8" />
+            <form
+                id="messageForm"
+                method="POST">
+                <input
+                    type="text"
+                    id="message"
+                    class="hidden w-full px-4 py-1 bg-gray-200 border border-lg border-gray-400 min-h-8" />
+            </form>
 
-            {{-- <div class="px-4 py-2 rounded-xl bg-green-300 h-max w-max m-auto">Join chat</div> --}}
-
-            {{-- <div class="col-span-4 p-4 m-auto">
-                <div>
-                    <x-heroicon-c-chat-bubble-left-right class="w-48 h-48 text-blue-400" />
-                    <p class="font-bold">Welcome to chat!</p>
-                    <p>Select corner or people to chat</p>
-                </div>
-            </div> --}}
+            <button
+                id="message_join"
+                onclick=""
+                class="hidden px-3 py-1 rounded-lg text-md bg-blue-500 hover:bg-blue-700 transition all 0.2s text-white h-max w-max m-auto">
+                Join chat
+            </button>
         </div>
     </div>
 
     <script>
         window.onload = () => {
-            conversationId = sessionStorage.getItem('conversationId');
-            roomType = sessionStorage.getItem('roomType');
+            const roomId = sessionStorage.getItem('roomId');
+            const userId = sessionStorage.getItem('userId');
+            const roomType = sessionStorage.getItem('roomType');
+            const roomName = sessionStorage.getItem('roomName');
+            const roomImageUrl = sessionStorage.getItem('roomImageUrl');
+            const conversationId = sessionStorage.getItem('conversationId');
+            const roomImageUrlAlt = sessionStorage.getItem('roomImageUrlAlt');
+            const handle = sessionStorage.getItem('handle');
 
-            roomName = sessionStorage.getItem('roomName');
-            roomImageUrl = sessionStorage.getItem('roomImageUrl');
-            roomImageUrlAlt = sessionStorage.getItem('roomImageUrlAlt');
-
-            if (conversationId) {
-                const chatroomWrapper = document.querySelector(`#room-${conversationId}`);
-                const roomNameElement = document.querySelector('#room-name');
-                const roomIconElement = document.querySelector('#room-icon');
-                const chatrooms = document.querySelector('#chatrooms');
-                const divs = chatrooms.querySelectorAll('div');
-
-                chatroomWrapper.classList.add('bg-gray-200');
-                chatroomWrapper.classList.remove('hover:bg-gray-100');
-
-                roomNameElement.innerText = roomName;
-                roomIconElement.src = roomImageUrl;
-                roomIconElement.alt = roomImageUrlAlt;
-            }
+            select(roomId, userId, conversationId, roomType, roomName, roomImageUrl, roomImageUrlAlt, handle);
         }
 
-        function select(conversationId, roomType, roomName, roomImageUrl, roomImageUrlAlt) {
+        function isAtBottom() {
+            const chat = document.querySelector('#chat');
+            return chat.scrollHeight - chat.scrollTop === chat.clientHeight;
+        }
+
+        const form = document.querySelector('#messageForm');
+        form.addEventListener('submit', (e) => {
+            event.preventDefault();
+
+            const message = document.querySelector('#message');
+            const userId = sessionStorage.getItem('userId');
+            const conversationId = sessionStorage.getItem('conversationId');
+
+            const formData = new FormData();
+            formData.append('content', message.value);
+            formData.append('userId', userId);
+            formData.append('conversationId', conversationId);
+
+            fetch('/chat/send-message', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                const chat = document.querySelector('#chat');
+                const messageElement = createMyMessage(message.value);
+
+                const wasAtBottom = isAtBottom();
+
+                chat.appendChild(messageElement);
+                
+                if (wasAtBottom) {
+                    chat.scrollTop = chat.scrollHeight;
+                }
+
+                const roomId = sessionStorage.getItem('roomId');
+                const lastMessage = document.querySelector(`#room-${roomId}-last-message`);
+                lastMessage.innerText = `you: ${message.value}`;
+            });
+        });
+
+        function join(userId, conversationId) {
+            const formData = new FormData();
+            formData.append('userId', userId);
+            formData.append('conversationId', conversationId);
+
+            fetch('/chat/join', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                sessionStorage.setItem('isMember', true);
+
+                const leaveElement = document.querySelector('#leave');
+                const message = document.querySelector('#message');
+                const messageJoin = document.querySelector('#message_join');
+
+                const userId = sessionStorage.getItem('userId');
+                const conversationId = sessionStorage.getItem('conversationId');
+
+                message.classList.remove('hidden');
+                messageJoin.classList.add('hidden');
+                leaveElement.classList.remove('hidden');
+
+                leaveElement.onclick = () => leave(userId, conversationId);
+            });
+        }
+
+        function select(roomId, userId, conversationId, roomType, roomName, roomImageUrl, roomImageUrlAlt, handle) {
+            sessionStorage.setItem('roomId', roomId);
+            sessionStorage.setItem('userId', userId);
             sessionStorage.setItem('conversationId', conversationId);
             sessionStorage.setItem('roomType', roomType);
             sessionStorage.setItem('roomName', roomName);
             sessionStorage.setItem('roomImageUrl', roomImageUrl);
             sessionStorage.setItem('roomImageUrlAlt', roomImageUrlAlt);
+            sessionStorage.setItem('handle', handle);
 
             fetch(`/chat/` + conversationId)
                 .then(response => response.json())
                 .then(data => {
+                    const isMember = data['is_member'];
+                    sessionStorage.setItem('isMember', isMember);
+
+                    const message = document.querySelector('#message');
+                    const messageJoin = document.querySelector('#message_join');
+
+                    const introduction = document.querySelector('#introduction');
+                    introduction.classList.add('hidden');
+                    
+                    const chat = document.querySelector('#chat');
+                    chat.classList.remove('hidden');
+
+                    const leaveElement = document.querySelector('#leave');
+
+                    if (isMember) {
+                        message.classList.remove('hidden');
+                        message.classList.add('flex');
+                        messageJoin.classList.add('hidden');
+
+                        leaveElement.classList.remove('hidden');
+                        leaveElement.onclick = () => leave(userId, conversationId);
+                    } else {
+                        message.classList.add('hidden');
+                        messageJoin.classList.remove('hidden');
+                        messageJoin.onclick = () => join(userId, conversationId);
+
+                        leaveElement.classList.add('hidden');
+                    }
 
                     const chatroomWrapper = document.querySelector(`#room-${conversationId}`);
                     const roomNameElement = document.querySelector('#room-name');
+                    const roomNameWrapperElement = document.querySelector('#room-name-wrapper');
                     const roomIconElement = document.querySelector('#room-icon');
+                    const roomIconWrapperElement = document.querySelector('#room-icon-wrapper');
                     const chatrooms = document.querySelector('#chatrooms');
                     const divs = chatrooms.querySelectorAll('div');
 
@@ -306,6 +440,15 @@
                     chatroomWrapper.classList.add('bg-gray-200');
                     chatroomWrapper.classList.remove('hover:bg-gray-100');
 
+                    const baseUrl = window.location.protocol + "//" + window.location.hostname;
+                    roomNameWrapperElement.href = `${baseUrl}/corners/${handle}`;
+                    roomNameWrapperElement.target = '_blank';
+                    roomNameWrapperElement.rel = 'noopener noreferrer';
+                    
+                    roomIconWrapperElement.href = `${baseUrl}/corners/${handle}`;
+                    roomIconWrapperElement.target = '_blank';
+                    roomIconWrapperElement.rel = 'noopener noreferrer';
+
                     if (roomType === 'group') {
                         roomIconElement.classList.add('rounded-lg');
                     } else {
@@ -315,8 +458,147 @@
                     roomNameElement.innerText = roomName;
                     roomIconElement.src = roomImageUrl;
                     roomIconElement.alt = roomImageUrlAlt;
+
+                    renderMessages(data['messages']);
                 });
-            // render(conversation['image_url'], conversation['name'])
+        }
+
+        function leave(userId, conversationId) {
+            const formData = new FormData();
+            formData.append('userId', userId);
+            formData.append('conversationId', conversationId);
+
+            fetch('/chat/leave', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                const leaveElement = document.querySelector('#leave');
+                leaveElement.classList.add('hidden');
+
+                // hide message input
+                const message = document.querySelector('#message');
+                message.classList.add('hidden');
+
+                const messageJoin = document.querySelector('#message_join');
+                messageJoin.classList.remove('hidden');
+                messageJoin.onclick = () => join(userId, conversationId);
+            });
+        }
+
+        function renderMessages(messages) {
+            const chat = document.querySelector('#chat');
+            chat.innerHTML = '';
+
+            const currentUserId = JSON.parse(sessionStorage.getItem('userId'));
+
+            for (const message of messages) {
+                if (!message['user']) {
+                    const messageElement = createSystemMessage(message);
+                    chat.appendChild(messageElement);
+                } else {
+                    if (currentUserId === message['user_id']) {
+                        const messageElement = createMyMessage(message['content']);
+                        chat.appendChild(messageElement);
+                    } else {
+                        const messageElement = createOppositeMessage(message);
+                        chat.appendChild(messageElement);
+                    }
+                }
+            }
+        }
+
+        function createMyMessage(message) {
+            const div = document.createElement('div');
+            div.classList.add('flex');
+            div.classList.add('justify-end');
+
+            const innerDiv = document.createElement('div');
+            innerDiv.classList = 'bg-green-200 py-1 px-2 rounded-lg w-max border border-black/20 grid';
+            innerDiv.innerText = message;
+
+            div.appendChild(innerDiv);
+            return div;
+        }
+
+        function createOppositeMessage(message) {
+            let baseUrl = window.location.protocol + "//" + window.location.hostname + "/";
+
+            const div = document.createElement('div');
+            div.classList.add('flex');
+            div.classList.add('gap-2');
+
+            const imageWrapper = document.createElement('a');
+            imageWrapper.href = `${baseUrl}users/${message['user']['username']}`;
+            imageWrapper.target = '_blank';
+            imageWrapper.rel = 'noopener noreferrer';
+
+            const image = document.createElement('img');
+            image.classList = 'w-8 h-8 inline rounded-full';
+            image.src = '/img/user.png';
+            image.alt = 'user.png';
+
+            imageWrapper.append(image);
+
+            if (message['user']['image_url']) {
+                image.src = `${baseUrl}/storage/icons/${message['user']['image_url']}`;
+            }
+
+            const innerDiv = document.createElement('div');
+            const p = document.createElement('p');
+
+            const pWrapper = document.createElement('a');
+            pWrapper.href = `${baseUrl}users/${message['user']['username']}`;
+            pWrapper.target = '_blank';
+            pWrapper.rel = 'noopener noreferrer';
+            pWrapper.classList = 'w-max inline-block leading-tight';
+
+            p.classList ='text-sm w-max';
+
+            const span = document.createElement('span');
+            span.classList = 'font-bold leading-tight';
+
+            span.innerText = message['user']['name'];
+
+            p.appendChild(span);
+            pWrapper.appendChild(p);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.classList = 'text-sm bg-gray-200 mt-1 py-1 px-2 rounded-lg w-max h-max border border-black/20';
+            contentDiv.innerText = message['content'];
+
+            innerDiv.appendChild(pWrapper);
+            innerDiv.appendChild(contentDiv);
+
+            div.appendChild(imageWrapper);
+            div.appendChild(innerDiv);
+
+            return div;
+        }
+
+        function createSystemMessage(message) {
+            const div = document.createElement('div');
+            div.classList = 'flex justify-center';
+
+            const p = document.createElement('p');
+            p.classList = 'bg-gray-200 text-sm py-1 px-2 rounded-lg w-max border border-black/20 grid';
+
+            if (message['content'] === 'user_joined') {
+                p.innerText = `${message['target_user']['username']} has joined the group`;
+            } else if (message['content'] === 'user_left') {
+                p.innerText = `${message['target_user']['username']} has left the group`;
+            } else {
+                p.innerText = message['content'];
+            }
+
+            div.appendChild(p);
+
+            return div;
         }
     </script>
 </body>

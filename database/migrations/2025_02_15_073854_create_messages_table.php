@@ -15,10 +15,11 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class)->constrained()->onDelete('set null');
+            $table->foreignIdFor(User::class)->nullable()->constrained()->onDelete('set null');
             $table->ForeignIdFor(Conversation::class)->constrained()->cascadeOnDelete();
             $table->text('content');
             $table->boolean('is_system')->default(false);
+            $table->foreignIdFor(User::class, 'target_user_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
         });
     }

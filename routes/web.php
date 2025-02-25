@@ -32,7 +32,10 @@ Route::get('/dev/profiles', function () {
 
 Route::controller(ChatController::class)->prefix('chat')->group(function () {
     Route::get('/', 'index')->middleware('auth')->name('chat');
+    Route::post('/join', 'join');
     Route::get('/{id}', 'fetch');
+    Route::post('/send-message', 'sendMessage');
+    Route::post('/leave', 'leave');
 });
 
 Route::get('/', function () {

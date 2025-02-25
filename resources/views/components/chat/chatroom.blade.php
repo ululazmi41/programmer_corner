@@ -5,8 +5,12 @@
     <div>
         <p class="leading-tight text-sm font-bold">{{ $room['name'] }}</p>
         @if ($room['last_message_content'] !== null)
-            <p class="leading-tight text-sm">
-                {{ $room['last_message_user_id'] === Auth::id() ? "you" : $room['last_message_user_name'] }}: {{ $room['last_message_content'] }}
+            <p id="room-{{ $room['id'] }}-last-message" class="leading-tight text-sm">
+                @if ($room['last_message_user_id'])
+                    {{ $room['last_message_user_id'] === Auth::id() ? "you" : $room['last_message_user_name'] }}: {{ $room['last_message_content'] }}
+                @else
+                    {{ $room['last_message_content'] }}
+                @endif
             </p>
         @endif
     </div>
