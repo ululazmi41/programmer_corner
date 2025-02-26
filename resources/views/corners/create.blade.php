@@ -113,7 +113,7 @@
             if (input.value != "") {
                 render.innerText = input.value;
             } else {
-                render.innerText = "Untitle";
+                render.innerText = "Untitled";
             }
         }
 

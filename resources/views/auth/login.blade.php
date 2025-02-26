@@ -41,9 +41,6 @@
                                 register
                             </a>
                         </p>
-                        <a href="/dev/profiles" class="cursor-pointer text-blue-600 hover:underline hover:decoration-blue-400 hover:text-blue-400 transition transform">
-                            profiles
-                        </a>
                     </div>
                 </div>
                 <button

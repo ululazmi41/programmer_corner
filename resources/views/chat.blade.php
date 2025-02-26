@@ -27,58 +27,16 @@
                             '{{ $room['corner_id'] }}',
                             '{{ $room['handle'] }}');" />
                 @endforeach
-                <div class="flex gap-2 p-2 items-center hover:bg-gray-200 transition cursor-pointer">
-                    <Image class="w-10 h-10 inline" src="/img/{{ 'javascript.png' }}" alt="{{ 'javascript.png' }}" />
-                    <div>
-                        <p class="leading-tight text-sm font-bold">Javascript</p>
-                        <p class="leading-tight text-sm">Ronald: Yes, that's correct...</p>
-                    </div>
-                </div>
-                <div class="flex gap-2 p-2 items-center hover:bg-gray-100 transition cursor-pointer">
-                    <Image class="w-10 h-10 inline" src="/img/{{ 'go.png' }}" alt="{{ 'go.png' }}" />
-                    <div>
-                        <p class="leading-tight text-sm font-bold">Golang</p>
-                        <p class="leading-tight text-sm">Civ: About that message...</p>
-                    </div>
-                </div>
-                <div class="flex gap-2 p-2 items-center hover:bg-gray-100 transition cursor-pointer">
-                    <Image class="w-10 h-10 inline" src="/img/{{ 'rust.png' }}" alt="{{ 'rust.png' }}" />
-                    <div>
-                        <p class="leading-tight text-sm font-bold">Rust</p>
-                        <p class="leading-tight text-sm">Nacy: Nope, still no clue at...</p>
-                    </div>
-                </div>
-                <div class="flex gap-2 p-2 items-center hover:bg-gray-100 transition cursor-pointer">
-                    <Image class="w-10 h-10 inline" src="/img/{{ 'kotlin.png' }}" alt="{{ 'kotlin.png' }}" />
-                    <div>
-                        <p class="leading-tight text-sm font-bold">Kotlin</p>
-                        <p class="leading-tight text-sm">Daniel: Sorry, but I've...</p>
-                    </div>
-                </div>
-                <div class="flex gap-2 p-2 items-center hover:bg-gray-100 transition cursor-pointer">
-                    <Image class="w-10 h-10 inline" src="/img/{{ 'typescript.png' }}" alt="{{ 'typescript.png' }}" />
-                    <div>
-                        <p class="leading-tight text-sm font-bold">Typescript</p>
-                        <p class="leading-tight text-sm">Bob: That's not supposed...</p>
-                    </div>
-                </div>
-                <div class="flex gap-2 p-2 items-center hover:bg-gray-100 transition cursor-pointer">
-                    <Image class="w-10 h-10 inline" src="/img/{{ 'ruby.png' }}" alt="{{ 'ruby.png' }}" />
-                    <div>
-                        <p class="leading-tight text-sm font-bold">Ruby</p>
-                        <p class="leading-tight text-sm">Lily: Just rest the case, and...</p>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="w-4/5 px-4 pt-2 pb-4 flex flex-col">
             <div class="flex justify-between">
                 <div class="flex gap-2 p-2 items-center transition">
                     <a id="room-icon-wrapper" href="#">
-                        <Image id="room-icon" class="w-8 h-8 inline" src="/img/{{ 'javascript.png' }}" alt="{{ 'javascript.png' }}" />
+                        <Image id="room-icon" class="w-8 h-8 hidden" src="" alt="" />
                     </a>
                     <a id="room-name-wrapper" href="#">
-                        <p id="room-name" class="leading-tight text-sm font-bold">Javascript</p>
+                        <p id="room-name" class="leading-tight text-sm font-bold"></p>
                     </a>
                 </div>
                 <button
@@ -297,6 +255,8 @@
                     roomNameElement.innerText = roomName;
                     roomIconElement.src = roomImageUrl;
                     roomIconElement.alt = roomImageUrlAlt;
+                    roomIconElement.classList.remove('hidden');
+                    roomIconElement.classList.add('inline');
 
                     renderMessages(data['messages'], data['role']);
                 });

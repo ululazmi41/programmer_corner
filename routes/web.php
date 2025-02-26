@@ -10,11 +10,9 @@ use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use App\Models\Comment;
-use App\Models\Corner;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use function App\Helpers\addBookmarks;
@@ -23,11 +21,6 @@ use function App\Helpers\sortPostsByPopularity;
 
 Route::get('test', function() {
     dd('test');
-});
-
-Route::get('/dev/profiles', function () {
-    $users = User::all();
-    return view('dev.profiles', compact('users'));
 });
 
 Route::controller(ChatController::class)->prefix('chat')->group(function () {
