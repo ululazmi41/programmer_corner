@@ -16,18 +16,27 @@
             </div>
         </div>
         <div>
-            @if (Auth::id() !== $user->id)
-                <button
-                    id="follow-{{ $user->id }}"
-                    onclick="follow('{{ $user->id }}', '{{ $user->username }}');"
-                    class="{{ $user->followers->contains('id', Auth::id()) ? "hidden" : "" }} h-max text-sm font-semibold lg:text-base bg-blue-500 hover:bg-blue-400 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
-                >+ follow</button>
-                <button
-                    id="unfollow-{{ $user->id }}"
-                    onclick="unfollow('{{ $user->id }}', '{{ $user->username }}');"
-                    class="{{ $user->followers->contains('id', Auth::id()) ? "" : "hidden" }} h-max text-sm font-semibold lg:text-base bg-black/40 hover:bg-black/30 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
-                >✓ following</button>
-            @endif
+            @auth
+                @if (Auth::id() !== $user->id)
+                    <button
+                        id="follow-{{ $user->id }}"
+                        onclick="follow('{{ $user->id }}', '{{ $user->username }}');"
+                        class="{{ $user->followers->contains('id', Auth::id()) ? "hidden" : "" }} h-max text-sm font-semibold lg:text-base bg-blue-500 hover:bg-blue-400 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
+                    >+ follow</button>
+                    <button
+                        id="unfollow-{{ $user->id }}"
+                        onclick="unfollow('{{ $user->id }}', '{{ $user->username }}');"
+                        class="{{ $user->followers->contains('id', Auth::id()) ? "" : "hidden" }} h-max text-sm font-semibold lg:text-base bg-black/40 hover:bg-black/30 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
+                    >✓ following</button>
+                @endif
+            @endauth
+            @guest
+                <a href="{{ route('login') }}">
+                    <button
+                        class="h-max text-sm font-semibold lg:text-base bg-blue-500 hover:bg-blue-400 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
+                    >+ follow</button>
+                </a>
+            @endguest
         </div>
     </div>
     <div class="text-sm md:text-md text-gray-500">{{ $user->description }}</div>

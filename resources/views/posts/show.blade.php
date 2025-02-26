@@ -48,18 +48,30 @@
                 <p class="mt-1 text-sm md:text-md">{!! nl2br(e($post->content)) !!}</p>
                 <div class="flex justify-between mt-2">
                     <div class="flex gap-2 sm:gap-3">
-                        <div id="dislike#{{ $post->id }}" onclick="toggleLike('{{ $post->id }}')"
-                            class="{{ $post->liked ?? false ? 'block' : 'hidden' }} text-gray-500 hover:text-gray-700 flex items-center gap-1 cursor-pointer border border-gray-400 bg-gray-200 px-2 py-1 rounded-lg">
-                            <x-heroicon-s-heart class="w-4 h-4" />
-                            <p class="text-xs sm:text-sm leading-tight">{{ intval($post->likesCount) + intval(!$post->liked)}} <span
-                                    class="hidden sm:inline">likes</span></p>
-                        </div>
-                        <div id="like#{{ $post->id }}" onclick="toggleLike('{{ $post->id }}')"
-                            class="{{ $post->liked ?? false ? 'hidden' : 'block' }} text-gray-500 hover:text-gray-700 flex items-center gap-1 cursor-pointer border border-gray-400 bg-gray-200 px-2 py-1 rounded-lg">
-                            <x-heroicon-o-heart class="w-4 h-4" />
-                            <p class="text-xs sm:text-sm leading-tight">{{ $post->likesCount - intval($post->liked)  }} <span
-                                    class="hidden sm:inline">likes</span></p>
-                        </div>
+                        @auth
+                            <div id="dislike#{{ $post->id }}" onclick="toggleLike('{{ $post->id }}')"
+                                class="{{ $post->liked ?? false ? 'block' : 'hidden' }} text-gray-500 hover:text-gray-700 flex items-center gap-1 cursor-pointer border border-gray-400 bg-gray-200 px-2 py-1 rounded-lg">
+                                <x-heroicon-s-heart class="w-4 h-4" />
+                                <p class="text-xs sm:text-sm leading-tight">{{ intval($post->likesCount) + intval(!$post->liked)}} <span
+                                        class="hidden sm:inline">likes</span></p>
+                            </div>
+                            <div id="like#{{ $post->id }}" onclick="toggleLike('{{ $post->id }}')"
+                                class="{{ $post->liked ?? false ? 'hidden' : 'block' }} text-gray-500 hover:text-gray-700 flex items-center gap-1 cursor-pointer border border-gray-400 bg-gray-200 px-2 py-1 rounded-lg">
+                                <x-heroicon-o-heart class="w-4 h-4" />
+                                <p class="text-xs sm:text-sm leading-tight">{{ $post->likesCount - intval($post->liked)  }} <span
+                                        class="hidden sm:inline">likes</span></p>
+                            </div>
+                        @endauth
+                        @guest
+                            <a href="{{ route('login') }}">
+                                <div class="text-gray-500 hover:text-gray-700 flex items-center gap-1 cursor-pointer border border-gray-400 bg-gray-200 px-2 py-1 rounded-lg">
+                                    <x-heroicon-o-heart class="w-4 h-4" />
+                                    <p class="text-xs sm:text-sm leading-tight">{{ $post->likesCount - intval($post->liked)  }}
+                                        <span class="hidden sm:inline">likes</span>
+                                    </p>
+                                </div>
+                            </a>
+                        @endguest
                         <div class="flex items-center gap-1 text-gray-500 hover:text-gray-700 border border-gray-400 bg-gray-200 px-2 py-1 rounded-lg">
                             <x-heroicon-o-chat-bubble-left-right class="w-4 h-4" />
                             <p class="text-xs sm:text-sm leading-tight">{{ count($post->comments) }} <span
@@ -72,21 +84,25 @@
                         </div>
                         <x-post.menu :content="$post" :type="\App\Enums\ContentType::POST" />
                     </div>
-                    <div id="bookmarked#{{ $post->id }}" onclick="togglePostBookmark('{{ $post->id }}', {{ Auth::check() }})"
-                        class="{{ $bookmark ?? false ? 'block' : 'hidden' }}">
-                        <x-heroicon-s-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
-                    </div>
-                    <div id="bookmarking#{{ $post->id }}" onclick="togglePostBookmark('{{ $post->id }}', {{ Auth::check() }})"
-                        class="{{ $bookmark ?? false ? 'hidden' : 'block' }}">
-                        <x-heroicon-o-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
-                    </div>
+                    @auth
+                        <div id="bookmarked#{{ $post->id }}" onclick="togglePostBookmark('{{ $post->id }}', {{ Auth::check() }})"
+                            class="{{ $bookmark ?? false ? 'block' : 'hidden' }}">
+                            <x-heroicon-s-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
+                        </div>
+                        <div id="bookmarking#{{ $post->id }}" onclick="togglePostBookmark('{{ $post->id }}', {{ Auth::check() }})"
+                            class="{{ $bookmark ?? false ? 'hidden' : 'block' }}">
+                            <x-heroicon-o-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
+                        </div>
+                    @endauth
                 </div>
-                <x-form.textarea name="body" id="comment-body" />
-                <div class="flex mt-2">
-                    <button onclick="sendComment('{{ $post->id }}', 'comment-body')" class="text-sm lg:text-base bg-blue-500 rounded-lg py-1 px-3 lg:px-4 text-white ml-auto" type="submit">
-                        Submit
-                    </button>
-                </div>
+                @auth
+                    <x-form.textarea name="body" id="comment-body" />
+                    <div class="flex mt-2">
+                        <button onclick="sendComment('{{ $post->id }}', 'comment-body')" class="text-sm lg:text-base bg-blue-500 rounded-lg py-1 px-3 lg:px-4 text-white ml-auto" type="submit">
+                            Submit
+                        </button>
+                    </div>
+                @endauth
                 <div class="space-y-4" id="comments">
                     @foreach ($post->comments as $comment)
                         <x-comment
@@ -97,6 +113,7 @@
                 </div>
             </div>
         </div>
+        <x-trending />
 
         <script>
             function sendComment(postId, id) {
@@ -181,6 +198,5 @@
                 bookmarkingButton.classList.toggle("block");
             }
         </script>
-        <x-trending />
     </div>
 </x-layout>

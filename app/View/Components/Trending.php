@@ -17,7 +17,7 @@ class Trending extends Component
      */
     public function __construct()
     {
-        $this->trendingPosts = getTrendingPosts(3);
+        $this->trendingPosts = getTrendingPosts(5);
     
         foreach ($this->trendingPosts as $post) {
             $post->likesCount = count($post->likes);

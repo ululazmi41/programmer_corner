@@ -10,7 +10,7 @@ use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use App\Models\Comment;
-use App\Models\Notification;
+use App\Models\Corner;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -22,7 +22,7 @@ use function App\Helpers\addCountsPosts;
 use function App\Helpers\sortPostsByPopularity;
 
 Route::get('test', function() {
-    dd(User::find(Auth::id())->notifications->toArray());
+    dd('test');
 });
 
 Route::get('/dev/profiles', function () {
@@ -131,8 +131,8 @@ Route::controller(UserController::class)->group(function () {
         Route::post('follow', 'follow')->middleware('auth')->name('user.follow');
         Route::delete('unfollow', 'unfollow')->middleware('auth')->name('user.unfollow');
         
-        Route::get('following', 'following')->middleware('auth')->name('user.following');
-        Route::get('followers', 'followers')->middleware('auth')->name('user.followers');
+        Route::get('following', 'following')->name('user.following');
+        Route::get('followers', 'followers')->name('user.followers');
     });
 
     Route::prefix("settings")->group(function () {

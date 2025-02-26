@@ -150,14 +150,16 @@
                         @endif
                     @endauth
                 </div>
-                <div id="bookmarked#{{ $id }}" onclick="toggleBookmark('{{ $id }}', '{{ $contentId }}', '{{ $type }}', {{ Auth::check() }})"
-                    class="{{ $bookmark ? 'block' : 'hidden' }}">
-                    <x-heroicon-s-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
-                </div>
-                <div id="bookmarking#{{ $id }}" onclick="toggleBookmark('{{ $id }}', '{{ $contentId }}', '{{ $type }}', {{ Auth::check() }})"
-                    class="{{ $bookmark ? 'hidden' : 'block' }}">
-                    <x-heroicon-o-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
-                </div>
+                @auth
+                    <div id="bookmarked#{{ $id }}" onclick="toggleBookmark('{{ $id }}', '{{ $contentId }}', '{{ $type }}', {{ Auth::check() }})"
+                        class="{{ $bookmark ? 'block' : 'hidden' }}">
+                        <x-heroicon-s-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
+                    </div>
+                    <div id="bookmarking#{{ $id }}" onclick="toggleBookmark('{{ $id }}', '{{ $contentId }}', '{{ $type }}', {{ Auth::check() }})"
+                        class="{{ $bookmark ? 'hidden' : 'block' }}">
+                        <x-heroicon-o-bookmark class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" />
+                    </div>
+                @endauth
             </div>
         </div>
     </div>

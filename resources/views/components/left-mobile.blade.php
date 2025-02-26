@@ -29,13 +29,8 @@
     @endauth
     <div class="bg-gray-300 h-px w-full overflow-auto"></div>
     <div class="flex flex-col mt-2 gap-1">
-        <x-left-corners name="Golang" imageUrl="go.png" href="/" />
-        <x-left-corners name="Rust" imageUrl="rust.png" href="/" />
-        <x-left-corners name="Ruby" imageUrl="ruby.png" href="/" />
-        <x-left-corners name="Kotlin" imageUrl="kotlin.png" href="/" />
-        <x-left-corners name="Typescript" imageUrl="typescript.png" href="/" />
-        <x-left-corners name="Python" imageUrl="python.png" href="/" />
-        <x-left-corners name="Javascript" imageUrl="javascript.png" href="/" />
-        <x-left-corners name="Dart" imageUrl="dart.png" href="/" />
+        @foreach ($corners as $corner)
+            <x-left-corners name="{{ $corner->name }}" imageUrl="{{ asset('storage/icons/' . $corner->icon_url) }}" href="{{ route('corners.show', ['handle' => $corner->handle]) }}" />
+        @endforeach
     </div>
 </div>

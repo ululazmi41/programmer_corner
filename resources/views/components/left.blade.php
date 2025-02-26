@@ -1,4 +1,4 @@
-<div class="hidden md:block sticky h-full top-10 pl-8 w-48">
+<div class="hidden md:block sticky h-full top-10 pt-2 pl-8 w-48">
     <ul class="flex flex-col">
         <li><a href="/" class="relative group flex gap-2 text-sm py-2 hover:bg-gray-200 transition transform rounded-lg px-4">
             <x-heroicon-o-home class="w-6 h-6 group-hover:hidden" />
@@ -33,13 +33,8 @@
     @endauth
     <div class="bg-gray-300 h-px w-full"></div>
     <div class="flex flex-col mt-4">
-        <x-left-corners name="Golang" imageUrl="go.png" href="/" />
-        <x-left-corners name="Rust" imageUrl="rust.png" href="/" />
-        <x-left-corners name="Ruby" imageUrl="ruby.png" href="/" />
-        <x-left-corners name="Kotlin" imageUrl="kotlin.png" href="/" />
-        <x-left-corners name="Typescript" imageUrl="typescript.png" href="/" />
-        <x-left-corners name="Python" imageUrl="python.png" href="/" />
-        <x-left-corners name="Javascript" imageUrl="javascript.png" href="/" />
-        <x-left-corners name="Dart" imageUrl="dart.png" href="/" />
+        @foreach ($corners as $corner)
+            <x-left-corners name="{{ $corner->name }}" imageUrl="{{ asset('storage/icons/' . $corner->icon_url) }}" href="{{ route('corners.show', ['handle' => $corner->handle]) }}" />
+        @endforeach
     </div>
 </div>

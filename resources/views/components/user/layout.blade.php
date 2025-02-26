@@ -16,7 +16,7 @@
 @endphp
 
 <x-layout>
-    <div class="flex md:gap-4 pt-4 md:pt-16">
+    <div class="flex justify-between md:gap-4 pt-4 md:pt-16">
         <x-left />
         <div class="w-full md:w-3/5 py-8 px-4 md:p-0 md:pb-4">
             <image id="icon" class="w-16 h-16 rounded-full" src="{{ $user["image_url"] ? asset('storage/icons/' . $user["image_url"]) : "/img/user.png" }}" alt="profile picture" />
@@ -25,18 +25,27 @@
                     <p class="font-bold text-xl leading-tight">{{ $user["name"] }}</p>
                     <p class="text-gray-400 leading-tight">{{ '@' }}{{ $user["username"] }}</p>
                 </div>
-                @if (Auth::id() !== $user->id)
-                    <button
-                        id="follow"
-                        onclick="follow('{{ $user->id }}', '{{ $user->username }}')"
-                        class="{{ $user->followers->contains('id', Auth::id()) ? "hidden" : "" }} h-max text-sm font-semibold lg:text-base bg-blue-500 hover:bg-blue-400 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
-                    >+ follow</button>
-                    <button
-                        id="unfollow"
-                        onclick="unfollow('{{ $user->id }}', '{{ $user->username }}')"
-                        class="{{ $user->followers->contains('id', Auth::id()) ? "" : "hidden" }} h-max text-sm font-semibold lg:text-base bg-black/40 hover:bg-black/30 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
-                    >✓ following</button>
-                @endif
+                @auth
+                    @if (Auth::id() !== $user->id)
+                        <button
+                            id="follow"
+                            onclick="follow('{{ $user->id }}', '{{ $user->username }}')"
+                            class="{{ $user->followers->contains('id', Auth::id()) ? "hidden" : "" }} h-max text-sm font-semibold lg:text-base bg-blue-500 hover:bg-blue-400 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
+                        >+ follow</button>
+                        <button
+                            id="unfollow"
+                            onclick="unfollow('{{ $user->id }}', '{{ $user->username }}')"
+                            class="{{ $user->followers->contains('id', Auth::id()) ? "" : "hidden" }} h-max text-sm font-semibold lg:text-base bg-black/40 hover:bg-black/30 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
+                        >✓ following</button>
+                    @endif
+                @endauth
+                @guest
+                    <a href="{{ route('login') }}">
+                        <button
+                            class="h-max text-sm font-semibold lg:text-base bg-blue-500 hover:bg-blue-400 transition transform duration-100 rounded-2xl py-1 px-3 lg:px-4 text-white ml-auto"
+                        >+ follow</button>
+                    </a>
+                @endguest
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('user.following', ['username' => $user->username]) }}">
