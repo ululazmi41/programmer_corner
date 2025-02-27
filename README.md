@@ -16,8 +16,9 @@ Built with:
 ![view forum](/screenshots//5_corner.png)
 ![create post](/screenshots//6_create-post.png)
 ![view post](/screenshots//7_view-post.png)
-![notifications](/screenshots//8_notifications.png)
-![chat](/screenshots//9_chat.png)
+![User page](/screenshots//user.png)
+![notifications](/screenshots//notifications.png)
+![chat](/screenshots//chat.png)
 
 ## Features
 
